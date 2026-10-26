@@ -1,0 +1,21 @@
+# Build output and shared builds
+dist/
+*.exe
+*.pdb
+*.zip
+
+# Local data that must never be committed
+settings.ini
+*.log
+*.log.old
+
+# Python cache (tools/)
+__pycache__/
+
+# Editors / OS
+.vs/
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
+.DS_Store

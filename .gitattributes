@@ -1,0 +1,10 @@
+* text=auto
+
+# Windows files keep Windows line endings
+*.bat  text eol=crlf
+*.cs   text eol=crlf
+
+# Binaries
+*.ico  binary
+*.png  binary
+*.exe  binary
