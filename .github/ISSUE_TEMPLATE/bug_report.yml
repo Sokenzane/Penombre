@@ -1,56 +1,56 @@
-name: Bug report
-description: Something does not work as expected
+name: Signaler un bug
+description: Quelque chose ne marche pas comme prévu
 labels: [bug]
 body:
   - type: textarea
     id: what
     attributes:
-      label: What happened?
-      description: What did you do, what did you expect, what happened instead?
+      label: Que s'est-il passé ?
+      description: Qu'as-tu fait, qu'attendais-tu, que s'est-il passé à la place ?
     validations:
       required: true
   - type: input
     id: version
     attributes:
-      label: Pénombre version
-      placeholder: e.g. 0.3.0 (right-click Penombre.exe > Properties > Details)
+      label: Version de Pénombre
+      placeholder: ex. 0.5.0 (clic droit sur Penombre.exe > Propriétés > Détails)
     validations:
       required: true
   - type: input
     id: windows
     attributes:
-      label: Windows version
-      placeholder: e.g. Windows 10 22H2, Windows 11 24H2
+      label: Version de Windows
+      placeholder: ex. Windows 10 22H2, Windows 11 24H2
     validations:
       required: true
   - type: dropdown
     id: render
     attributes:
-      label: Renderer
+      label: Rendu
       options:
         - Shader
-        - Veil
-        - Both
+        - Voile
+        - Les deux
   - type: textarea
     id: setup
     attributes:
-      label: Setup
-      description: Number of Dofus clients, windowed or fullscreen windowed, screens (count, resolution, scaling).
-      placeholder: e.g. 2 clients, fullscreen windowed, 2 screens 1920×1080 at 100 % and 2560×1440 at 125 %
+      label: Configuration
+      description: Nombre de clients Dofus, fenêtré ou plein écran fenêtré, écrans (nombre, résolution, mise à l'échelle).
+      placeholder: ex. 2 clients, plein écran fenêtré, 2 écrans 1920×1080 à 100 % et 2560×1440 à 125 %
   - type: textarea
     id: diagnostics
     attributes:
-      label: Diagnostics
-      description: Tray menu > Copy diagnostics, then paste here. It contains your window titles (character names) — replace them with XXX if you prefer.
+      label: Diagnostic
+      description: Menu de la zone de notification > Copier le diagnostic, puis colle-le ici. Il contient les titres de tes fenêtres (noms de personnages) : remplace-les par XXX si tu préfères.
       render: text
   - type: textarea
     id: log
     attributes:
-      label: Log
-      description: Tray menu > Open the log, then paste the last lines (especially ERROR lines).
+      label: Journal
+      description: Menu de la zone de notification > Ouvrir le journal, puis colle les dernières lignes (surtout les lignes ERROR).
       render: text
   - type: textarea
     id: screenshots
     attributes:
-      label: Screenshots
-      description: Drag and drop images here if useful.
+      label: Captures d'écran
+      description: Glisse-dépose des images ici si c'est utile.

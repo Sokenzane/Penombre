@@ -1,226 +1,225 @@
 <p align="center">
-  <img src="assets/logo.png" width="96" alt="Pénombre logo">
+  <img src="assets/logo.png" width="96" alt="Logo de Pénombre">
 </p>
 
 <h1 align="center">Pénombre</h1>
 
 <p align="center">
-  A <b>night mode</b> for Dofus 3, like the one Dofus 1.29 had.<br>
-  One small <code>.exe</code>, nothing to install. Windows 10 and 11 (64-bit).
+  Un <b>mode nuit</b> pour Dofus 3, comme celui de Dofus 1.29.<br>
+  Un petit <code>.exe</code>, rien à installer. Windows 10 et 11 (64 bits).
 </p>
 
 <p align="center">
-  <a href="https://github.com/Sokenzane/Penombre/releases/latest"><img src="https://img.shields.io/github/v/release/Sokenzane/Penombre?label=download" alt="Latest release"></a>
-  <a href="https://github.com/Sokenzane/Penombre/actions/workflows/build.yml"><img src="https://github.com/Sokenzane/Penombre/actions/workflows/build.yml/badge.svg" alt="Build"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0-blue" alt="License: GPL-3.0"></a>
+  <a href="https://github.com/Sokenzane/Penombre/releases/latest"><img src="https://img.shields.io/github/v/release/Sokenzane/Penombre?label=t%C3%A9l%C3%A9charger" alt="Dernière version"></a>
+  <a href="https://github.com/Sokenzane/Penombre/actions/workflows/build.yml"><img src="https://github.com/Sokenzane/Penombre/actions/workflows/build.yml/badge.svg" alt="Compilation"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/licence-GPL--3.0-blue" alt="Licence : GPL-3.0"></a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/Sokenzane/Penombre/releases/latest/download/Penombre.exe"><b>Download Penombre.exe</b></a>
-  &nbsp;·&nbsp; <a href="README.fr.md">Lire en français</a>
+  <a href="https://github.com/Sokenzane/Penombre/releases/latest/download/Penombre.exe"><b>Télécharger Penombre.exe</b></a>
 </p>
 
-## Contents
+## Sommaire
 
-- [What is it?](#what-is-it)
-- [Is it safe for my account?](#is-it-safe-for-my-account)
-- [Download](#download)
-- [How to use](#how-to-use)
-  - [Keyboard shortcuts](#keyboard-shortcuts)
-  - [Settings window](#settings-window)
-  - [Moods](#moods)
-  - [Automatic mode](#automatic-mode)
-  - [Bright zones](#bright-zones)
-  - [Several accounts](#several-accounts)
-  - [Notification area icon](#notification-area-icon)
-  - [Portable mode and backup](#portable-mode-and-backup)
-- [How it works](#how-it-works)
-  - [Renderers](#renderers)
-  - [Multi-account](#multi-account)
-  - [Performance](#performance)
-- [Files](#files)
-- [Diagnostics and log](#diagnostics-and-log)
-- [Known limitations](#known-limitations)
-- [Build from source](#build-from-source)
-- [Contributing](#contributing)
-- [License](#license)
+- [C'est quoi ?](#cest-quoi-)
+- [Est-ce sans risque pour mon compte ?](#est-ce-sans-risque-pour-mon-compte-)
+- [Téléchargement](#téléchargement)
+- [Utilisation](#utilisation)
+  - [Raccourcis](#raccourcis)
+  - [Fenêtre de réglages](#fenêtre-de-réglages)
+  - [Ambiances](#ambiances)
+  - [Mode automatique](#mode-automatique)
+  - [Zones claires](#zones-claires)
+  - [Plusieurs comptes](#plusieurs-comptes)
+  - [Icône de la zone de notification](#icône-de-la-zone-de-notification)
+  - [Mode portable et sauvegarde](#mode-portable-et-sauvegarde)
+- [Fonctionnement](#fonctionnement)
+  - [Rendus](#rendus)
+  - [Multi-compte](#multi-compte)
+  - [Performances](#performances)
+- [Fichiers](#fichiers)
+- [Diagnostic et journal](#diagnostic-et-journal)
+- [Limites connues](#limites-connues)
+- [Compiler soi-même](#compiler-soi-même)
+- [Contribuer](#contribuer)
+- [Licence](#licence)
 
-## What is it?
+## C'est quoi ?
 
-*"Pénombre"* is French for *"half-light"*. Dofus 1.29 could turn the game to night; Dofus 3 cannot. Pénombre lays a click-through filter over the game area that darkens it, cools the colors down and lifts the blacks a little, for a nocturnal mood:
+Dofus 1.29 pouvait passer le jeu en mode nuit ; Dofus 3 ne le peut pas. Pénombre pose sur la zone de jeu un filtre traversé par les clics qui l'assombrit, refroidit les couleurs et relève un peu les noirs, pour une ambiance nocturne :
 
-- **Real color rework** (shader): every pixel is redrawn through a color matrix, not just covered with a dark layer.
-- **Moods**: blue night, moonlight, dusk, pitch black, old-school night, or your own.
-- **Follows the real time** if you want, with fixed times or the **real sunset and sunrise** of your city, and smooth transitions.
-- **Multi-account ready**: one filter per Dofus window, which never stacks up, and **per-account settings**.
-- **Bright zones**: keep the spell bar or the chat readable.
-- **Peek**: hold a shortcut to see the game without filter.
-- Optional **vignette** (with your own tint) and **film grain**.
+- **Vrai travail des couleurs** (shader) : chaque pixel est recalculé à travers une matrice de couleur, au lieu d'être simplement recouvert d'une couche sombre.
+- **Ambiances** : nuit bleutée, clair de lune, crépuscule, nuit noire, nuit d'antan, ou la tienne.
+- **Suit l'heure réelle** si tu veux, avec des horaires fixes ou le **vrai coucher et lever du soleil** de ta ville, et des transitions douces.
+- **Prêt pour le multi-compte** : un filtre par fenêtre Dofus, sans cumul d'assombrissement, et des **réglages par compte**.
+- **Zones claires** : la barre de sorts ou le chat restent lisibles.
+- **Coup d'œil** : maintiens un raccourci pour voir le jeu sans filtre.
+- **Vignettage** (teinte au choix) et **grain pellicule** en option.
 
-## Is it safe for my account?
+## Est-ce sans risque pour mon compte ?
 
-Pénombre **never touches the Dofus client**: no injection, no memory reading, nothing is sent to the game or to the servers. The filter is a separate Windows window placed over the game, like a screen tint (f.lux, Windows night light…). It only uses public Windows functions to find the game windows and draw over them.
+Pénombre **ne touche jamais au client Dofus** : pas d'injection, pas de lecture mémoire, rien n'est envoyé au jeu ni aux serveurs. Le filtre est une fenêtre Windows à part, posée par-dessus le jeu, comme une teinte d'écran (f.lux, l'éclairage nocturne de Windows…). Il utilise seulement des fonctions publiques de Windows pour trouver les fenêtres du jeu et dessiner par-dessus.
 
-Ankama has not reviewed or approved Pénombre. Read the game's terms of use yourself and use it at your own risk.
+Ankama n'a ni examiné ni approuvé Pénombre. Lis toi-même les conditions d'utilisation du jeu, et utilise-le à tes risques.
 
-## Download
+## Téléchargement
 
-**[Download Penombre.exe](https://github.com/Sokenzane/Penombre/releases/latest/download/Penombre.exe)** and run it. No installer, no admin rights. Release notes and previous versions are on the [Releases](https://github.com/Sokenzane/Penombre/releases) page, with the SHA-256 of each exe (see [SECURITY.md](SECURITY.md#verifying-a-download)). It needs .NET Framework 4, which comes with every Windows 10 and 11.
+**[Télécharge Penombre.exe](https://github.com/Sokenzane/Penombre/releases/latest/download/Penombre.exe)** et lance-le. Pas d'installation, pas de droits administrateur. Les notes de version et les versions précédentes sont sur la page [Releases](https://github.com/Sokenzane/Penombre/releases), avec le SHA-256 de chaque exe (voir [SECURITY.md](SECURITY.md#vérifier-un-téléchargement)). Il faut .NET Framework 4, fourni avec tous les Windows 10 et 11.
 
-> The exe is not code-signed, so Windows SmartScreen may show *"Windows protected your PC"*. Click **More info**, then **Run anyway**. You can also [build it yourself](#build-from-source) in one click.
+> L'exe n'est pas signé : Windows SmartScreen peut afficher *« Windows a protégé votre ordinateur »*. Clique sur **Informations complémentaires**, puis **Exécuter quand même**. Tu peux aussi [le compiler toi-même](#compiler-soi-même) en un clic.
 
-Dofus must run **windowed** or **fullscreen windowed**: in exclusive fullscreen, no window can be drawn over the game.
+Dofus doit être en mode **fenêtré** ou **plein écran fenêtré** : en plein écran exclusif, aucune fenêtre ne peut s'afficher par-dessus le jeu.
 
-## How to use
+## Utilisation
 
-Run `Penombre.exe`: a moon egg appears in the notification area (next to the clock, sometimes hidden behind the `^` arrow). Left-click it to turn the filter on or off, right-click it for the menu.
+Lance `Penombre.exe` : un œuf de lune apparaît dans la zone de notification (près de l'horloge, parfois cachée derrière la flèche `^`). Clic gauche dessus pour activer ou couper le filtre, clic droit pour le menu. Relancer `Penombre.exe` alors qu'il tourne déjà ouvre la fenêtre de réglages.
 
-### Keyboard shortcuts
+### Raccourcis
 
-| Default shortcut | Action |
+| Raccourci par défaut | Action |
 | --- | --- |
-| `Ctrl+Alt+N` | Filter on / off (with a fade) |
-| `Ctrl+Alt+C` | **Peek**: hold it to see the game without filter |
-| `Ctrl+Alt+A` | Automatic mode on / off |
-| `Ctrl+Alt+P` | Next mood |
-| `Ctrl+Alt+PgUp` / `PgDn` | Intensity +5 % / -5 % |
-| `Ctrl+Alt+V` | Next vignette (none, light, medium, strong) |
+| `Ctrl+Alt+N` | Activer / couper le filtre (avec fondu) |
+| `Ctrl+Alt+C` | **Coup d'œil** : maintiens-le pour voir le jeu sans filtre |
+| `Ctrl+Alt+A` | Activer / couper le mode automatique |
+| `Ctrl+Alt+P` | Ambiance suivante |
+| `Ctrl+Alt+PgUp` / `PgDn` | Intensité +5 % / -5 % |
+| `Ctrl+Alt+V` | Vignettage suivant (aucun, léger, moyen, fort) |
 
-Every shortcut can be changed in **Settings… > Shortcuts** (click a box, press the new combination; `Backspace` removes it). A shortcut already taken by another app is marked *unavailable*. When the Dofus in the foreground has its [own settings](#several-accounts), the mood, intensity and vignette shortcuts change those.
+Chaque raccourci se change dans **Réglages… > Raccourcis** (clique dans une case, appuie sur la nouvelle combinaison ; `Retour arrière` le supprime). Un raccourci déjà pris par une autre appli est signalé *indisponible*. Quand le Dofus au premier plan a des [réglages propres](#plusieurs-comptes), les raccourcis d'ambiance, d'intensité et de vignettage modifient ceux-là.
 
-### Settings window
+### Fenêtre de réglages
 
-Menu **Settings…**. The window follows the spirit of the Dofus 3 interface: sections on the left, green sliders and buttons. Everything applies live, with a smooth transition:
+Menu **Réglages…**. La fenêtre reprend l'esprit de l'interface de Dofus 3 : rubriques à gauche, curseurs et boutons verts. Tout s'applique en direct, avec une transition douce :
 
-| Tab | Content |
+| Onglet | Contenu |
 | --- | --- |
-| Mood | live preview (a part of the game without and with the filter), moods as swatches, custom mood sliders, intensity, vignette and its tint, film grain, renderer |
-| Schedule | automatic mode (fixed times or real sun), transition duration (0 to 2 s) |
-| Accounts | per-account settings |
-| Display | notification area icon, bright zones, "only when Dofus is in the foreground" |
-| Shortcuts | every shortcut, customizable |
-| General | start with Windows, portable mode, settings folder, export / import, log |
+| Ambiance | aperçu en direct (une partie du jeu sans et avec le filtre), ambiances en vignettes, curseurs de l'ambiance personnalisée, intensité, vignettage et sa teinte, grain pellicule, rendu |
+| Horaires | mode automatique (horaires fixes ou vrai soleil), durée des transitions (0 à 2 s) |
+| Comptes | réglages par compte |
+| Affichage | icône de la zone de notification, zones claires, « seulement quand Dofus est au premier plan » |
+| Raccourcis | tous les raccourcis, personnalisables |
+| Général | lancement au démarrage, mode portable, dossier des réglages, export / import, journal |
 
-### Moods
+### Ambiances
 
-The intensity (5 to 100 %) blends between the original picture and the full mood.
+L'intensité (5 à 100 %) dose l'effet entre l'image d'origine et l'ambiance complète.
 
-| Mood | Brightness | Saturation | Tint |
+| Ambiance | Luminosité | Saturation | Teinte |
 | --- | --- | --- | --- |
-| Blue night | 55 % | 55 % | cold blue |
-| Moonlight | 70 % | 30 % | pale blue, lifted blacks |
-| Dusk | 72 % | 80 % | warm purple |
-| Pitch black | 38 % | 50 % | light blue |
-| Old-school night | 62 % | 90 % | blue, 1.29 style |
-| Custom | your choice | your choice | cold ↔ warm, lifted blacks |
+| Nuit bleutée | 55 % | 55 % | bleu froid |
+| Clair de lune | 70 % | 30 % | bleu pâle, noirs relevés |
+| Crépuscule | 72 % | 80 % | violet chaud |
+| Nuit noire | 38 % | 50 % | bleu léger |
+| Nuit d'antan | 62 % | 90 % | bleu, façon 1.29 |
+| Personnalisée | réglable | réglable | froid ↔ chaud, noirs relevés |
 
-Moving a slider in the settings creates a **Custom** mood from the current one.
+Toucher un curseur dans les réglages crée une ambiance **Personnalisée** à partir de l'ambiance en cours.
 
-### Automatic mode
+### Mode automatique
 
-The filter follows your PC's clock, with two ways to set the times:
+Le filtre suit l'heure de ton PC, avec deux façons de régler les horaires :
 
-- **Fixed times** (below);
-- **Real sunset and sunrise**: pick your city (or enter coordinates). Night falls 45 min before sunset and is complete 45 min after; dawn works the same way around sunrise. Computed offline, so the times follow the seasons.
+- **Horaires fixes** (ci-dessous) ;
+- **Vrai coucher et lever du soleil** : choisis ta ville (ou saisis des coordonnées). La nuit tombe 45 min avant le coucher et est complète 45 min après ; l'aube fonctionne pareil autour du lever. Le calcul se fait sans connexion, et les horaires suivent les saisons.
 
-| Moment | Default | Filter |
+| Moment | Par défaut | Filtre |
 | --- | --- | --- |
-| Dusk starts | 19:30 | rises gradually |
-| Full night | 21:30 | full effect |
-| Dawn starts | 06:30 | fades out gradually |
-| Full day | 08:30 | none (shader paused) |
+| Début du crépuscule | 19:30 | monte progressivement |
+| Nuit complète | 21:30 | plein effet |
+| Début de l'aube | 06:30 | redescend progressivement |
+| Jour complet | 08:30 | aucun (shader suspendu) |
 
-### Bright zones
+### Zones claires
 
-To keep the spell bar, the chat or the timeline readable: **Settings… > Draw the zones…**. A layer appears over the Dofus window: drag to draw a zone, right-click a zone to remove it, `Del` to clear all, `Enter` to save, `Esc` to cancel. Zones apply to every account. By default they are **anchored to their nearest edge** (a spell bar at the bottom stays at the bottom) and **grow with the window height**, like the Dofus interface; untick both options in **Display** for zones proportional to the window.
+Pour garder lisibles la barre de sorts, le chat ou la timeline : **Réglages… > Définir les zones…**. Un calque s'affiche sur la fenêtre Dofus : glisse pour dessiner une zone, clic droit sur une zone pour la supprimer, `Suppr` pour tout effacer, `Entrée` pour valider, `Échap` pour annuler. Les zones valent pour tous les comptes. Par défaut, elles sont **ancrées au bord le plus proche** (une barre de sorts en bas reste en bas) et **grandissent avec la hauteur de la fenêtre**, comme l'interface de Dofus ; décoche ces deux options dans **Affichage** pour des zones proportionnelles à la fenêtre.
 
-### Several accounts
+### Plusieurs comptes
 
-Each character can be filtered or not, from the **Accounts** menu or the settings. In **Settings… > Accounts**, a character can also get **its own mood, intensity and vignette** instead of the default ones. Characters are recognized from their window title, and their settings are kept even when they are not open.
+Chaque personnage peut être filtré ou non, depuis le menu **Comptes** ou les réglages. Dans **Réglages… > Comptes**, un personnage peut aussi avoir **sa propre ambiance, intensité et vignettage** au lieu de ceux par défaut : il suffit de changer l'un des trois pour que ses réglages propres s'activent. Les personnages sont reconnus au titre de leur fenêtre, et leurs réglages sont gardés même quand ils ne sont pas ouverts.
 
-Option **Only when Dofus is in the foreground** (Display tab): the filter only shows on the Dofus window you are playing.
+Option **Seulement quand Dofus est au premier plan** (onglet Affichage) : le filtre ne s'affiche que sur la fenêtre Dofus sur laquelle tu joues.
 
-### Notification area icon
+### Icône de la zone de notification
 
-The icon shows the state at a glance: night, dusk or dawn, day (automatic mode, no filter), filter off. Three styles to choose from in **Settings… > Display**:
+L'icône montre l'état d'un coup d'œil : nuit, crépuscule ou aube, jour (mode auto, pas de filtre), filtre coupé. Trois styles au choix dans **Réglages… > Affichage** :
 
-| Style | Night | Dusk | Day | Off |
+| Style | Nuit | Crépuscule | Jour | Coupé |
 | --- | --- | --- | --- | --- |
-| **Moon egg** (default) | sapphire egg, golden moon | pink and amber egg | amber egg, sun | cracked stone egg |
-| **Watcher egg** | eyes open | eyes open | asleep | grey, asleep |
-| **Round moon** | full moon | crescent | outline | grey crescent |
+| **Œuf de lune** (par défaut) | œuf saphir, lune dorée | œuf rose et ambre | œuf ambré, soleil | œuf de pierre fêlé |
+| **Œuf veilleur** | yeux ouverts | yeux ouverts | endormi | gris, endormi |
+| **Lune bombée** | pleine lune | croissant | contour | croissant gris |
 
-### Portable mode and backup
+### Mode portable et sauvegarde
 
-- **Portable mode** (General tab): settings and log move to a `Penombre-data` folder next to the exe. Copy the folder with the exe to another PC and everything comes along, zones included. Untick it to move them back to `%APPDATA%`.
-- **Export… / Import…**: save your settings to a file, or load a file saved on another PC.
+- **Mode portable** (onglet Général) : réglages et journal passent dans un dossier `Penombre-data` à côté de l'exe. Copie le dossier avec l'exe sur un autre PC, tout suit, zones comprises. Décoche pour les remettre dans `%APPDATA%`.
+- **Exporter… / Importer…** : enregistre tes réglages dans un fichier, ou charge un fichier enregistré sur un autre PC.
 
-## How it works
+## Fonctionnement
 
-The Dofus 3 windows are found automatically (window class `UnityWndClass` in a `Dofus` process).
+Les fenêtres Dofus 3 sont détectées automatiquement (classe de fenêtre `UnityWndClass` dans un processus `Dofus`).
 
-### Renderers
+### Rendus
 
-- **Shader** (default): the Windows Magnification API redraws the game area through a 5×5 color matrix. Brightness is multiplied, colors are desaturated, tinted, and the blacks lifted. It is the same idea as the Flash `ColorTransform` behind the night of Dofus 1.29.
-- **Veil**: a plain semi-transparent colored layer, used as a fallback when the shader is not available.
-- **Vignette** (optional, with both renderers): darker edges and corners, clear center, drawn with per-pixel alpha.
+- **Shader** (par défaut) : l'API Magnification de Windows redessine la zone de jeu à travers une matrice de couleur 5×5. La luminosité est multipliée, les couleurs désaturées et teintées, les noirs relevés. C'est le même principe que le `ColorTransform` Flash de la nuit de Dofus 1.29.
+- **Voile** : une simple couche colorée semi-transparente, en repli si le shader n'est pas disponible.
+- **Vignettage** (optionnel, avec les deux rendus) : bords et coins assombris, centre dégagé, dessiné en alpha par pixel.
 
-### Multi-account
+### Multi-compte
 
-Each filter is clipped (`SetWindowRgn`) to the part of its Dofus window that is **actually visible**. Pénombre walks the windows from the top of the Windows Z-order down: whatever lies above a Dofus window (another app, another client) hides the part it covers. Two filters never overlap, so the darkening never stacks up when you switch between accounts.
+Chaque filtre est découpé (`SetWindowRgn`) à la partie **réellement visible** de sa fenêtre Dofus. Pénombre parcourt les fenêtres du haut vers le bas de la pile Windows : tout ce qui est au-dessus d'une fenêtre Dofus (autre appli, autre client) en masque la partie couverte. Deux filtres ne se superposent jamais, et l'assombrissement ne s'accumule pas quand tu passes d'un compte à l'autre.
 
-Click-through windows (GPU, Discord or Steam overlays…), invisible and cloaked windows (other virtual desktops) are not treated as obstacles.
+Les fenêtres traversées par les clics (overlays GPU, Discord, Steam…), invisibles ou masquées (autres bureaux virtuels) ne comptent pas comme des obstacles.
 
-### Performance
+### Performances
 
-- Pénombre reacts to Windows events (a window moved, shown, hidden, brought to the front…) instead of checking everything in a loop. A safety check runs every 500 ms.
-- Shader: 60 frames per second for the Dofus window in the foreground, about 20 for the ones in the background.
-- The shader pauses when Dofus is minimized or fully hidden, when the filter is off, or in full day (automatic mode). The app then idles at 10 checks per second.
+- Pénombre réagit aux événements Windows (fenêtre déplacée, affichée, masquée, mise au premier plan…) au lieu de tout revérifier en boucle. Une vérification de secours a lieu toutes les 500 ms.
+- Shader : 60 images/s pour le Dofus au premier plan, environ 20 pour ceux en arrière-plan.
+- Le shader est suspendu quand Dofus est réduit ou entièrement caché, quand le filtre est coupé, ou en plein jour (mode auto). Le programme passe alors au ralenti (10 vérifications par seconde).
 
-## Files
+## Fichiers
 
-In `%APPDATA%\Penombre\` (or `Penombre-data` next to the exe in [portable mode](#portable-mode-and-backup)):
+Dans `%APPDATA%\Penombre\` (ou `Penombre-data` à côté de l'exe en [mode portable](#mode-portable-et-sauvegarde)) :
 
-- `settings.ini`: all the settings, per-account settings and shortcuts included. If your client is not called `Dofus.exe`, edit the `process=` line. Delete the file to reset everything.
-- `penombre.log`: the log (start, game windows found, errors). Past 512 KB it is renamed to `penombre.log.old`.
+- `settings.ini` : tous les réglages, y compris ceux par compte et les raccourcis. Si ton client ne s'appelle pas `Dofus.exe`, modifie la ligne `process=`. Supprime le fichier pour tout remettre à zéro.
+- `penombre.log` : le journal (démarrage, fenêtres détectées, erreurs). Au-delà de 512 Ko, il est renommé en `penombre.log.old`.
 
-The interface follows the Windows display language (French or English); `--lang=fr` or `--lang=en` forces it. Start with Windows writes one value under `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`; nothing else is written to your system.
+L'interface suit la langue de Windows (français ou anglais) ; `--lang=fr` ou `--lang=en` force la langue. Le lancement au démarrage écrit une seule valeur sous `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` ; rien d'autre n'est écrit sur ton système.
 
-## Diagnostics and log
+## Diagnostic et journal
 
-- **Copy diagnostics**: copies the full state to the clipboard (Windows version, Dofus windows, filters, automatic mode, zones, accounts, Windows Z-order). It contains your window titles, so your character names: hide them before posting it publicly if you prefer.
-- **Open the log**: opens `penombre.log` in Notepad.
+- **Copier le diagnostic** : copie l'état complet dans le presse-papiers (version de Windows, fenêtres Dofus, filtres, mode auto, zones, comptes, pile des fenêtres Windows). Il contient les titres de tes fenêtres, donc tes noms de personnages : masque-les avant de le publier si tu préfères.
+- **Ouvrir le journal** : ouvre `penombre.log` dans le Bloc-notes.
 
-## Known limitations
+## Limites connues
 
-- Exclusive fullscreen is not supported (see [Download](#download)).
-- The game interface is darkened too, unless you set [bright zones](#bright-zones). If they drift after a resize, try the other zone options or redraw them.
-- The shader is a per-pixel color transform (matrix), not a programmable GPU shader: no blur, bloom or local lighting.
-- With the shader, the filtered picture can be one frame behind the game.
-- Film grain uses about 25 MB of memory per Dofus window, and takes a fraction of a second to prepare when turned on or when the window is resized.
-- Sun times assume your PC's time zone is the one of the chosen city.
+- Le plein écran exclusif n'est pas pris en charge (voir [Téléchargement](#téléchargement)).
+- L'interface du jeu est assombrie aussi, sauf si tu définis des [zones claires](#zones-claires). Si elles se décalent après un redimensionnement, essaie les autres options de zones ou redessine-les.
+- Le shader est une transformation de couleur par pixel (matrice), pas un shader GPU programmable : pas de flou, de bloom ni de lumière localisée.
+- En rendu shader, l'image filtrée peut avoir une image de retard sur le jeu.
+- Le grain pellicule utilise environ 25 Mo de mémoire par fenêtre Dofus, et met une fraction de seconde à se préparer à l'activation ou au redimensionnement.
+- Les horaires du soleil supposent que le fuseau horaire du PC est celui de la ville choisie.
 
-## Build from source
+## Compiler soi-même
 
-The code is in [`src/Penombre.cs`](src/Penombre.cs) and the interface in [`src/Interface.cs`](src/Interface.cs) (C# 5, WinForms, no dependency).
+Le code est dans [`src/Penombre.cs`](src/Penombre.cs) et l'interface dans [`src/Interface.cs`](src/Interface.cs) (C# 5, WinForms, aucune dépendance).
 
-1. Clone or download the repository.
-2. Double-click **`build.bat`**: it uses the C# compiler that ships with Windows.
-3. Run `dist\Penombre.exe`.
+1. Clone ou télécharge le dépôt.
+2. Double-clique sur **`build.bat`** : il utilise le compilateur C# fourni avec Windows.
+3. Lance `dist\Penombre.exe`.
 
-The icons and the logo are generated by `python tools/make_icon.py` (needs Pillow and Playwright).
+Les icônes et le logo sont générés par `python tools/make_icon.py` (nécessite Pillow et Playwright).
 
-## Contributing
+## Contribuer
 
-Bug reports, ideas and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md).
+Rapports de bugs, idées et pull requests sont les bienvenus. Voir [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## License
+## Licence
 
-Pénombre is free software, released under the [GNU General Public License v3.0](LICENSE).
-You can use, study, share and modify it; modified versions you distribute must stay open source under the same license and credit the original project.
+Pénombre est un logiciel libre, publié sous la [licence publique générale GNU v3.0](LICENSE).
+Tu peux l'utiliser, l'étudier, le partager et le modifier ; les versions modifiées que tu distribues doivent rester open source sous la même licence et créditer le projet d'origine.
 
 Copyright © 2026 [Sokenzane](https://github.com/Sokenzane).
 
-The [Nunito](https://github.com/googlefonts/nunito) font (© The Nunito Project Authors), embedded in the exe, is under the [SIL Open Font License 1.1](assets/fonts/OFL.txt).
+La police [Nunito](https://github.com/googlefonts/nunito) (© The Nunito Project Authors), intégrée à l'exe, est sous [licence SIL Open Font 1.1](assets/fonts/OFL.txt).
 
-Pénombre is an independent fan project, not affiliated with or endorsed by Ankama. Dofus is a trademark of Ankama. No game asset is included in this repository.
+Pénombre est un projet de fan indépendant, ni affilié à Ankama ni approuvé par Ankama. Dofus est une marque d'Ankama. Aucun élément du jeu n'est inclus dans ce dépôt.

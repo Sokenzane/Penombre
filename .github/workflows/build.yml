@@ -42,9 +42,9 @@ jobs:
           fi
           {
             echo
-            echo "### Download"
+            echo "### Téléchargement"
             echo
-            echo "[**Penombre.exe**](https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/Penombre.exe) — Windows 10/11 64-bit, nothing to install."
+            echo "[**Penombre.exe**](https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/Penombre.exe) — Windows 10/11 64 bits, rien à installer."
             echo
             echo "SHA-256: \`$(sha256sum dist/Penombre.exe | cut -d' ' -f1)\`"
           } >> notes.md

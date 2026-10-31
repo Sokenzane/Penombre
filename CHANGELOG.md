@@ -1,6 +1,6 @@
-# Changelog
+# Journal des modifications
 
-## Contents
+## Sommaire
 
 - [0.5.0](#050)
 - [0.4.0](#040)
@@ -10,64 +10,64 @@
 
 ## 0.5.0
 
-- New **look** for the settings window, in the spirit of the Dofus 3 interface: sections on the left, slate panels in relief, green sliders with a gem handle, glowing buttons, embedded Nunito font
-- New **live preview** in the Mood section: a part of the game without and with the filter
-- Moods shown as **swatches**, each one seen through its own filter
-- New **notification area icons**: a moon egg that changes with the sky (default), a watcher egg that sleeps by day, or a round moon; chosen in Display
-- New icon and logo (the moon egg)
-- Times are typed in a dark time field; the tray menu uses the same colors
-- The self-test checks the new pages, the fonts and the 36 notification icon pictures, and that two accounts with the same settings get the same tint
-- Starting Pénombre again while it is running opens its settings window
-- Accounts section: changing the mood, intensity or vignette of a character turns on its own settings right away (the controls were greyed out until the box was ticked)
-- Fixed: a very thin window above Dofus (a tab handle of a window grouping tool, for example) cut a band in the filter
+- Nouveau **look** pour la fenêtre de réglages, dans l'esprit de l'interface de Dofus 3 : rubriques à gauche, panneaux d'ardoise en relief, curseurs verts à poignée en gemme, boutons lumineux, police Nunito intégrée
+- Nouvel **aperçu en direct** dans la rubrique Ambiance : une partie du jeu sans et avec le filtre
+- Ambiances présentées en **vignettes**, chacune vue à travers son propre filtre
+- Nouvelles **icônes de la zone de notification** : un œuf de lune qui change avec le ciel (par défaut), un œuf veilleur qui dort le jour, ou une lune bombée ; au choix dans Affichage
+- Nouvelle icône et nouveau logo (l'œuf de lune)
+- Les heures se saisissent dans un champ horaire sombre ; le menu de la zone de notification reprend les mêmes couleurs
+- Relancer Pénombre alors qu'il tourne déjà ouvre sa fenêtre de réglages
+- Rubrique Comptes : changer l'ambiance, l'intensité ou le vignettage d'un personnage active aussitôt ses réglages propres (les contrôles restaient grisés tant que la case n'était pas cochée)
+- Corrigé : une fenêtre très fine au-dessus de Dofus (la poignée d'onglet d'un outil qui regroupe les fenêtres, par exemple) coupait une bande dans le filtre
+- Le self-test vérifie les nouvelles pages, les polices et les 36 images d'icônes, et que deux comptes aux mêmes réglages reçoivent la même teinte
 
 ## 0.4.0
 
-- New **per-account settings**: a character can use its own mood, intensity and vignette instead of the default ones; settings are kept for characters that are not open
-- New **smooth transition** between moods, intensities and vignettes
-- New **peek** shortcut (`Ctrl+Alt+C` by default): hold it to see the game without filter
-- New **customizable shortcuts** (Shortcuts tab), with unavailable ones flagged
-- New **real sunset and sunrise** schedule: pick a city or coordinates, computed offline
-- New **notification area moon** that reflects the state: full, crescent, outline, grey
-- New **only when Dofus is in the foreground** option
-- New **vignette tint** and optional animated **film grain**
-- New **portable mode**: settings and log in a `Penombre-data` folder next to the exe
-- New **export / import** of the settings
-- Bright zones can be **anchored to their nearest edge** and **grow with the window height** (default)
-- Settings window reorganized in tabs
-- Fixed: the diagnostics and the log showed Windows 6.2 instead of the real Windows version
-- Fixed: the settings tabs could be too small for their content and show scroll bars; they are now sized on the largest tab
-- A filter hidden or minimized by another program is shown again automatically
-- Fixed: hovering a taskbar button (window previews) or Alt+Tab cut a band across the whole width of the filter
-- Fixed: a filter just created, shown again or cut around a bright zone could stay invisible for a moment; it is now drawn right away
-- Performance: shader frames are drawn by a render pump when the app is idle, instead of on the timer; they never delay shortcuts or window tracking. The shader runs at about 30 frames per second, the pace of the Windows Magnification API; Dofus windows that are not in front are refreshed at a quarter of that rate
-- The peek shortcut stops by itself after one minute, in case a key stays stuck
-- New self-test (`tools\selftest.bat`, test build only) that drives the app over running Dofus windows (one or several accounts) and checks 116 points
+- Nouveaux **réglages par compte** : un personnage peut avoir sa propre ambiance, intensité et vignettage au lieu de ceux par défaut ; les réglages sont gardés pour les personnages qui ne sont pas ouverts
+- Nouvelle **transition douce** entre ambiances, intensités et vignettages
+- Nouveau raccourci **coup d'œil** (`Ctrl+Alt+C` par défaut) : maintiens-le pour voir le jeu sans filtre
+- Nouveaux **raccourcis personnalisables** (onglet Raccourcis), avec signalement de ceux qui sont indisponibles
+- Nouvel horaire **vrai coucher et lever du soleil** : choisis une ville ou des coordonnées, calcul hors ligne
+- Nouvelle **lune dans la zone de notification** qui reflète l'état : pleine, croissant, contour, grise
+- Nouvelle option **seulement quand Dofus est au premier plan**
+- Nouvelle **teinte du vignettage** et **grain pellicule** animé en option
+- Nouveau **mode portable** : réglages et journal dans un dossier `Penombre-data` à côté de l'exe
+- Nouvel **export / import** des réglages
+- Les zones claires peuvent être **ancrées à leur bord le plus proche** et **suivre la hauteur de la fenêtre** (par défaut)
+- Fenêtre de réglages réorganisée en onglets
+- Corrigé : le diagnostic et le journal affichaient Windows 6.2 au lieu de la vraie version de Windows
+- Corrigé : les onglets de réglages pouvaient être trop petits pour leur contenu et afficher des barres de défilement ; ils sont maintenant dimensionnés sur le plus grand
+- Un filtre caché ou réduit par un autre programme est réaffiché automatiquement
+- Corrigé : survoler un bouton de la barre des tâches (aperçus des fenêtres) ou Alt+Tab coupait une bande sur toute la largeur du filtre
+- Corrigé : un filtre tout juste créé, réaffiché ou découpé autour d'une zone claire pouvait rester invisible un instant ; il est maintenant dessiné tout de suite
+- Performances : les images du shader sont dessinées par une pompe de rendu quand l'appli est inactive, au lieu du minuteur ; elles ne retardent jamais les raccourcis ni le suivi des fenêtres. Le shader tourne à environ 30 images par seconde, le rythme de l'API Magnification de Windows ; les fenêtres Dofus qui ne sont pas au premier plan sont rafraîchies au quart de ce rythme
+- Le coup d'œil s'arrête tout seul au bout d'une minute, au cas où une touche resterait bloquée
+- Nouveau self-test (`tools\selftest.bat`, version de test uniquement) qui pilote l'appli sur les fenêtres Dofus ouvertes (un ou plusieurs comptes) et vérifie 116 points
 
 ## 0.3.0
 
-- New **automatic mode**: the filter follows the real time (dusk, night, dawn, day), with adjustable times; shortcut `Ctrl+Alt+A`
-- New **smooth fade** when turning the filter on or off and at start (adjustable duration)
-- New **settings window**, applied live
-- New **Custom** mood: brightness, saturation, temperature, lifted blacks
-- New **per-account setting**: each character can be filtered or not
-- New **bright zones**: parts of the game interface (spells, chat…) stay unfiltered, with an editor drawn over the Dofus window
-- New **start with Windows** option
-- New **error log** (`%APPDATA%\Penombre\penombre.log`) and "Open the log" menu
-- Performance: reacts to Windows events instead of checking in a loop, shader at 20 frames per second for background Dofus windows, idles when no filter is shown
+- Nouveau **mode automatique** : le filtre suit l'heure réelle (crépuscule, nuit, aube, jour), avec des horaires réglables ; raccourci `Ctrl+Alt+A`
+- Nouveau **fondu** à l'activation, à la coupure et au démarrage (durée réglable)
+- Nouvelle **fenêtre de réglages**, appliqués en direct
+- Nouvelle ambiance **Personnalisée** : luminosité, saturation, température, noirs relevés
+- Nouveau **réglage par compte** : chaque personnage peut être filtré ou non
+- Nouvelles **zones claires** : des parties de l'interface du jeu (sorts, chat…) restent sans filtre, avec un éditeur dessiné sur la fenêtre Dofus
+- Nouvelle option **lancer au démarrage de Windows**
+- Nouveau **journal d'erreurs** (`%APPDATA%\Penombre\penombre.log`) et menu « Ouvrir le journal »
+- Performances : réagit aux événements de Windows au lieu de vérifier en boucle, shader à 20 images par seconde pour les fenêtres Dofus en arrière-plan, au repos quand aucun filtre n'est affiché
 
 ## 0.2.0
 
-- New **shader** renderer: the game area is redrawn through a color matrix (brightness, saturation, tint, bluish blacks); the veil stays available as a fallback
-- New **vignette** (none, light, medium, strong); shortcut `Ctrl+Alt+V`
-- New mood: Old-school night
-- Fixed: with several accounts, switching between Dofus windows made the game darker and darker. Each filter is now clipped to the visible part of its window, so filters never overlap
-- Fixed: simpler foreground handling (filters always on top, but cut around the windows that cover Dofus)
-- New **Copy diagnostics** menu
-- 64-bit executable
+- Nouveau rendu **shader** : la zone de jeu est redessinée à travers une matrice de couleur (luminosité, saturation, teinte, noirs bleutés) ; le voile reste disponible en secours
+- Nouveau **vignettage** (aucun, léger, moyen, fort) ; raccourci `Ctrl+Alt+V`
+- Nouvelle ambiance : Nuit d'antan
+- Corrigé : en multi-compte, passer d'une fenêtre Dofus à l'autre assombrissait le jeu de plus en plus. Chaque filtre est maintenant découpé à la partie visible de sa fenêtre, les filtres ne se superposent donc jamais
+- Corrigé : gestion du premier plan simplifiée (filtres toujours au-dessus, mais découpés autour des fenêtres qui couvrent Dofus)
+- Nouveau menu **Copier le diagnostic**
+- Exécutable 64 bits
 
 ## 0.1.0
 
-- Tinted, click-through filter fitted to the game area of each Dofus 3 window
-- Four moods, adjustable intensity, global shortcuts, notification area icon and menu
-- Settings saved, interface in French and English
+- Filtre teinté, traversé par les clics, ajusté à la zone de jeu de chaque fenêtre Dofus 3
+- Quatre ambiances, intensité réglable, raccourcis globaux, icône et menu dans la zone de notification
+- Réglages enregistrés, interface en français et en anglais

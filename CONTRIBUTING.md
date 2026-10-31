@@ -1,76 +1,76 @@
-# Contributing to Pénombre
+# Contribuer à Pénombre
 
-Thanks for your interest! Pénombre is a small project: one source file, no dependency. Keeping it that way is part of the goal.
+Merci de ton intérêt ! Pénombre est un petit projet : deux fichiers sources, aucune dépendance. Rester aussi simple fait partie du but.
 
-## Contents
+## Sommaire
 
-- [Report a bug or suggest an idea](#report-a-bug-or-suggest-an-idea)
-- [Build](#build)
+- [Signaler un bug ou proposer une idée](#signaler-un-bug-ou-proposer-une-idée)
+- [Compiler](#compiler)
 - [Self-test](#self-test)
-- [Code guidelines](#code-guidelines)
-- [Ground rules for game-related changes](#ground-rules-for-game-related-changes)
-- [Add a language](#add-a-language)
+- [Règles de code](#règles-de-code)
+- [Règles pour tout ce qui touche au jeu](#règles-pour-tout-ce-qui-touche-au-jeu)
+- [Ajouter une langue](#ajouter-une-langue)
 - [Pull requests](#pull-requests)
-- [Release (maintainer)](#release-maintainer)
+- [Publier une version (mainteneur)](#publier-une-version-mainteneur)
 
-## Report a bug or suggest an idea
+## Signaler un bug ou proposer une idée
 
-Open an [issue](https://github.com/Sokenzane/Penombre/issues/new/choose). For a bug, paste the output of **Copy diagnostics** (tray menu) and, if relevant, the end of the log (**Open the log**). Both contain your window titles, so your character names: replace them with `XXX` if you prefer.
+Ouvre un [ticket](https://github.com/Sokenzane/Penombre/issues/new/choose). Pour un bug, colle le résultat de **Copier le diagnostic** (menu de la zone de notification) et, si utile, la fin du journal (**Ouvrir le journal**). Les deux contiennent les titres de tes fenêtres, donc tes noms de personnages : remplace-les par `XXX` si tu préfères.
 
-## Build
+## Compiler
 
-Double-click `build.bat` (or run `build.bat ci` to skip the final pause). It compiles `src/Penombre.cs` and `src/Interface.cs` into `dist/Penombre.exe` (64-bit) with the C# compiler that ships with .NET Framework 4, so there is nothing to install.
+Double-clique sur `build.bat` (ou lance `build.bat ci` pour éviter la pause finale). Il compile `src/Penombre.cs` et `src/Interface.cs` en `dist/Penombre.exe` (64 bits) avec le compilateur C# fourni avec .NET Framework 4 : rien à installer.
 
-`--lang=en|fr` forces the language, `--data=<folder>` keeps the settings and the log in another folder.
+`--lang=fr|en` force la langue, `--data=<dossier>` range les réglages et le journal dans un autre dossier.
 
 ## Self-test
 
-With Dofus 3 open (one character logged in, windowed or fullscreen windowed), double-click `tools\selftest.bat`. It stops Pénombre, builds `dist\Penombre-test.exe` (the app plus [`src/SelfTest.cs`](src/SelfTest.cs)), runs it on a separate settings folder (`dist\selftest-data`, your settings are not touched), then rebuilds and restarts `dist\Penombre.exe`.
+Avec Dofus 3 ouvert (un personnage connecté, ou deux pour le multi-compte, en fenêtré ou plein écran fenêtré), double-clique sur `tools\selftest.bat`. Il arrête Pénombre, compile `dist\Penombre-test.exe` (l'appli plus [`src/SelfTest.cs`](src/SelfTest.cs)), le lance sur un dossier de réglages à part (`dist\selftest-data`, tes réglages ne sont pas touchés), puis recompile et relance `dist\Penombre.exe`.
 
-The test drives the real app over the game and measures the darkening on screen: renderers, fade, mood transitions, per-account settings, bright zones, vignette, grain, automatic mode, sun times, shortcuts registration, export / import, portable mode, start with Windows (restored as it was), settings window, performance. Bring Dofus to the front when asked, then follow the `MANUAL` lines of `dist\selftest-data\selftest-progress.txt` (shortcuts, peek, a window over Dofus, only-in-foreground).
+Le test pilote la vraie appli par-dessus le jeu et mesure l'assombrissement à l'écran : rendus, fondu, transitions d'ambiance, réglages par compte, zones claires, vignettage, grain, mode automatique, horaires du soleil, enregistrement des raccourcis, export / import, mode portable, lancement au démarrage (remis comme avant), fenêtre de réglages, multi-compte, performances. Mets Dofus au premier plan quand c'est demandé, puis suis les lignes `MANUAL` de `dist\selftest-data\selftest-progress.txt` (raccourcis, coup d'œil, une fenêtre par-dessus Dofus, seulement au premier plan). Ne touche pas au jeu pendant le reste du test : un compte inactif assombrit lui-même son écran et fausse les mesures.
 
-Results: `dist\selftest-data\selftest-report.txt` (with screen captures `snap-*.png` and `settings-tab*.png`). Every line must be `PASS`.
+Résultats : `dist\selftest-data\selftest-report.txt` (avec les captures `snap-*.png` et `settings-tab*.png`). Toutes les lignes doivent être `PASS`.
 
-## Code guidelines
+## Règles de code
 
-- **C# 5 only.** The Windows built-in compiler (`csc.exe` v4) stops at C# 5. Do not use string interpolation (`$"…"`), `=>` members, `?.`, `nameof`, `out var` or auto-property initializers. `build.bat` will tell you if something slipped through.
-- **No dependency.** The app is in `src/Penombre.cs`, its hand-drawn controls and colors in `src/Interface.cs`. Use WinForms, GDI+ and Win32 (P/Invoke) only. Embedded resources (icons, Nunito font) are listed in `build.bat`.
-- **Icons.** Change `tools/make_icon.py` and run it (Pillow and Playwright): it rewrites `assets/penombre.ico`, `assets/logo.png` and `assets/tray-icons.png`, without metadata.
-- **Physical pixels.** The process is per-monitor DPI aware: every coordinate is in physical pixels.
-- **No hard-coded UI text**: every string lives in `T` (English and French).
-- **Settings** go through the `Settings` class (`%APPDATA%\Penombre\settings.ini`); keep it a small key=value file.
-- **Errors** go to the log (`Log.Error`), never to a message box in a loop.
-- Code and comments in English, 4-space indentation, CRLF line endings (handled by `.editorconfig` and `.gitattributes`).
+- **C# 5 uniquement.** Le compilateur intégré à Windows (`csc.exe` v4) s'arrête à C# 5. Pas d'interpolation de chaînes (`$"…"`), de membres `=>`, de `?.`, de `nameof`, de `out var` ni d'initialiseurs de propriétés automatiques. `build.bat` te le dira si quelque chose passe.
+- **Aucune dépendance.** L'appli est dans `src/Penombre.cs`, ses contrôles dessinés à la main et ses couleurs dans `src/Interface.cs`. WinForms, GDI+ et Win32 (P/Invoke) uniquement. Les ressources intégrées (icônes, police Nunito) sont listées dans `build.bat`.
+- **Icônes.** Modifie `tools/make_icon.py` et lance-le (Pillow et Playwright) : il réécrit `assets/penombre.ico`, `assets/logo.png` et `assets/tray-icons.png`, sans métadonnées.
+- **Pixels physiques.** Le processus gère le DPI par écran : toutes les coordonnées sont en pixels physiques.
+- **Aucun texte d'interface en dur** : chaque texte est dans `T` (anglais et français).
+- **Les réglages** passent par la classe `Settings` (`%APPDATA%\Penombre\settings.ini`) ; garde un petit fichier clé=valeur.
+- **Les erreurs** vont dans le journal (`Log.Error`), jamais dans une boîte de message en boucle.
+- Code et commentaires en anglais, indentation de 4 espaces, fins de ligne CRLF (gérées par `.editorconfig` et `.gitattributes`).
 
-## Ground rules for game-related changes
+## Règles pour tout ce qui touche au jeu
 
-Pénombre must stay a pure overlay. Pull requests that do any of the following will not be accepted:
+Pénombre doit rester un simple calque par-dessus le jeu. Les pull requests qui font l'une de ces choses ne seront pas acceptées :
 
-- inject code into, or read or write the memory of, the Dofus client;
-- send input to the game, automate any game action, or read game data;
-- capture, store or send screenshots or any player data;
-- add game assets (images, sounds, fonts) from Ankama.
+- injecter du code dans le client Dofus, ou lire ou écrire sa mémoire ;
+- envoyer des entrées au jeu, automatiser une action de jeu, ou lire des données du jeu ;
+- capturer, stocker ou envoyer des captures d'écran ou des données de joueurs ;
+- ajouter des ressources du jeu (images, sons, polices) appartenant à Ankama.
 
-## Add a language
+## Ajouter une langue
 
-1. In `src/Penombre.cs`, find `static class T`.
-2. Add a column to every entry of `texts` and pick it in `S()` for your two-letter language code (e.g. `"es"`).
-3. Keep the `{0}` placeholders.
-4. Test with `dist\Penombre.exe --lang=es`, open the settings and the zone editor, and check that nothing is cut off.
-5. Mention the language in both READMEs.
+1. Dans `src/Penombre.cs`, trouve `static class T`.
+2. Ajoute une colonne à chaque entrée de `texts` et choisis-la dans `S()` pour le code de ta langue sur deux lettres (par exemple `"es"`).
+3. Garde les marqueurs `{0}`.
+4. Teste avec `dist\Penombre.exe --lang=es`, ouvre les réglages et l'éditeur de zones, et vérifie que rien n'est coupé.
+5. Mentionne la langue dans le README.
 
 ## Pull requests
 
-1. Fork, create a branch, make your change.
-2. Check that `build.bat` compiles, run the [self-test](#self-test) and test on Windows with Dofus 3 (ideally with two clients for multi-account changes).
-3. Add a line to `CHANGELOG.md` under **Unreleased**.
-4. Open the pull request and fill in the checklist.
+1. Fork, crée une branche, fais ta modification.
+2. Vérifie que `build.bat` compile, lance le [self-test](#self-test) et teste sur Windows avec Dofus 3 (idéalement avec deux clients pour ce qui touche au multi-compte).
+3. Ajoute une ligne dans `CHANGELOG.md`, dans une section **Non publié** en haut.
+4. Ouvre la pull request et remplis la liste de vérification.
 
-By contributing, you agree that your contribution is licensed under the [GPL-3.0](LICENSE), like the rest of the project.
+En contribuant, tu acceptes que ta contribution soit publiée sous [GPL-3.0](LICENSE), comme le reste du projet.
 
-## Release (maintainer)
+## Publier une version (mainteneur)
 
-1. Update `Program.Version` and the two `AssemblyVersion` / `AssemblyFileVersion` lines in `src/Penombre.cs`.
-2. Rename the **Unreleased** section of `CHANGELOG.md` to the new version (e.g. `## 0.6.0`).
-3. Commit, then tag: `git tag v0.6.0` and `git push --tags`.
-4. GitHub Actions checks that the tag matches `Program.Version`, builds `Penombre.exe` and publishes the release with the CHANGELOG notes and the exe's SHA-256. The README download link always points to the latest release.
+1. Mets à jour `Program.Version` et les deux lignes `AssemblyVersion` / `AssemblyFileVersion` dans `src/Penombre.cs`.
+2. Renomme la section **Non publié** de `CHANGELOG.md` avec la nouvelle version (par exemple `## 0.6.0`) et ajoute-la au sommaire.
+3. Commit, puis tag : `git tag v0.6.0` et `git push --tags`.
+4. GitHub Actions vérifie que le tag correspond à `Program.Version`, compile `Penombre.exe` et publie la version avec les notes du CHANGELOG et le SHA-256 de l'exe. Le lien de téléchargement du README pointe toujours vers la dernière version.

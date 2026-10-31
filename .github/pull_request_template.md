@@ -1,11 +1,11 @@
-## What does this change?
+## Qu'est-ce que ça change ?
 
-<!-- One or two sentences. Link the issue if there is one: "Fixes #12". -->
+<!-- Une ou deux phrases. Indique le ticket s'il y en a un : « Fixes #12 ». -->
 
-## Checklist
+## Vérifications
 
-- [ ] `build.bat` compiles without errors (C# 5, no newer syntax)
-- [ ] Tested on Windows (version: …) with Dofus 3 (… client(s), … screen(s))
-- [ ] Still a pure overlay: nothing injected into, read from or sent to the game (see CONTRIBUTING.md)
-- [ ] New UI text added in **both** English and French in `T`
-- [ ] `CHANGELOG.md` updated under "Unreleased"
+- [ ] `build.bat` compile sans erreur (C# 5, pas de syntaxe plus récente)
+- [ ] Testé sur Windows (version : …) avec Dofus 3 (… client(s), … écran(s))
+- [ ] Toujours un simple calque : rien d'injecté dans le jeu, lu depuis le jeu ni envoyé au jeu (voir CONTRIBUTING.md)
+- [ ] Nouveaux textes d'interface ajoutés en anglais **et** en français dans `T`
+- [ ] `CHANGELOG.md` mis à jour dans la section « Non publié »
