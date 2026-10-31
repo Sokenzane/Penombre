@@ -53,14 +53,14 @@ using Microsoft.Win32;
 [assembly: AssemblyDescription("A night mode for Dofus 3")]
 [assembly: AssemblyProduct("Pénombre")]
 [assembly: AssemblyCopyright("Copyright (C) 2026 Sokenzane - GPL-3.0")]
-[assembly: AssemblyVersion("0.5.1.0")]
-[assembly: AssemblyFileVersion("0.5.1.0")]
+[assembly: AssemblyVersion("0.5.2.0")]
+[assembly: AssemblyFileVersion("0.5.2.0")]
 
 namespace Penombre
 {
     static partial class Program
     {
-        public const string Version = "0.5.1";
+        public const string Version = "0.5.2";
         public static bool SelfTestMode;   // test build only (src/SelfTest.cs)
         public static string DataOverride; // --data=<folder>: settings and log elsewhere
         public static string InstanceName { get { return SelfTestMode ? "Sokenzane.Penombre.SelfTest" : "Sokenzane.Penombre"; } }

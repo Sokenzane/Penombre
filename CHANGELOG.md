@@ -2,7 +2,7 @@
 
 ## Sommaire
 
-- [Non publié](#non-publié)
+- [0.5.2](#052)
 - [0.5.1](#051)
 - [0.5.0](#050)
 - [0.4.0](#040)
@@ -10,7 +10,7 @@
 - [0.2.0](#020)
 - [0.1.0](#010)
 
-## Non publié
+## 0.5.2
 
 - Nouvelle **vérification des mises à jour** : une fois par jour, Pénombre demande à GitHub si une version plus récente existe et le signale (bulle, ligne dans le menu, onglet Général). Rien n'est téléchargé tout seul ; désactivable
 - L'icône adaptative suit l'heure même quand le mode automatique est coupé (elle restait sur « nuit »)
