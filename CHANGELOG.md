@@ -2,7 +2,7 @@
 
 ## Sommaire
 
-- [Non publié](#non-publié)
+- [0.6.0](#060)
 - [0.5.2](#052)
 - [0.5.1](#051)
 - [0.5.0](#050)
@@ -11,7 +11,7 @@
 - [0.2.0](#020)
 - [0.1.0](#010)
 
-## Non publié
+## 0.6.0
 
 - Nouvelle **teinte de crépuscule** en mode automatique : quand la nuit tombe et quand le jour se lève, le filtre passe par les couleurs chaudes de l'ambiance Crépuscule (onglet Horaires, désactivable)
 - Nouvelle **pause** dans le menu : coupe le filtre 15 min, 30 min, 1 h ou 2 h, puis le remet tout seul
