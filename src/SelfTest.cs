@@ -633,6 +633,8 @@ namespace Penombre
                 Check("half filter at mid-dusk", m.AutoFactor > 0.35f && m.AutoFactor < 0.65f && Math.Abs(m.Shown - m.AutoFactor) < 0.05f && o.IsShown,
                     "factor=" + m.AutoFactor + " shown=" + m.Shown);
                 Check("tray icon shows the dusk state", app.StateName == "Twilight", app.StateName);
+                Check("dusk takes the warm colours of the Dusk mood", o.Current != null && o.Current.Tint[0] > 0.95f && o.Current.Tint[2] < 1.05f,
+                      o.Current != null ? "tint " + o.Current.Tint[0].ToString("0.00") + "/" + o.Current.Tint[1].ToString("0.00") + "/" + o.Current.Tint[2].ToString("0.00") : "no mood");
                 Settings.SunMode = true; Settings.SunCity = "Paris"; Settings.SunLat = 48.857; Settings.SunLon = 2.352;
                 app.NotifyChanged();
             }, 600);
@@ -643,6 +645,15 @@ namespace Penombre
                 Settings.Auto = false; Settings.SunMode = false; app.NotifyChanged();
             }, 600);
             Add("auto off", () => Check("full filter without auto", m.Shown >= 0.999f && o.IsShown, "shown=" + m.Shown), 100);
+
+            // Pause from the menu
+            Add("pause", () => app.Pause(15), 900);
+            Add("pause checks", () =>
+            {
+                Check("pause hides the filter without changing the settings", m.Shown == 0 && Settings.Enabled && app.StateName == "Off", "shown=" + m.Shown + " state=" + app.StateName);
+                app.Resume();
+            }, 900);
+            Add("resume checks", () => Check("the filter comes back after the pause", m.Shown >= 0.999f && o.IsShown, "shown=" + m.Shown), 100);
 
             // Shortcuts registration
             Add("custom shortcut", () =>

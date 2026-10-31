@@ -458,6 +458,13 @@ namespace Penombre
             { "settings",   new[] { "Settings…", "Réglages…" } },
             { "settingsT",  new[] { "Settings", "Réglages" } },
             { "diag",       new[] { "Copy diagnostics", "Copier le diagnostic" } },
+            { "duskTint",   new[] { "Dusk colours at sunset and sunrise", "Teinte de crépuscule au coucher et au lever du soleil" } },
+            { "duskHint",   new[] { "While night falls and while day breaks, the filter takes the warm colours of the Dusk mood, then goes back to your mood.",
+                                    "Pendant que la nuit tombe et que le jour se lève, le filtre prend les couleurs chaudes de l'ambiance Crépuscule, puis revient à ton ambiance." } },
+            { "pause",      new[] { "Pause", "Pause" } },
+            { "pauseFor",   new[] { "For {0}", "Pendant {0}" } },
+            { "pauseUntil", new[] { "Paused until {0}", "En pause jusqu'à {0}" } },
+            { "resume",     new[] { "Resume now", "Reprendre maintenant" } },
             { "updCheck",   new[] { "Check for updates (once a day, on GitHub)", "Vérifier les mises à jour (une fois par jour, sur GitHub)" } },
             { "updNow",     new[] { "Check now", "Vérifier maintenant" } },
             { "updSee",     new[] { "Get version {0}", "Obtenir la version {0}" } },
@@ -1074,6 +1081,7 @@ namespace Penombre
         public static bool TrayIconAuto = true;     // the icon follows the sky of the automatic mode
         public static int TrayIconColor = 0;        // otherwise, the picture kept while the filter is on (TrayIcons.Night / Twilight / Day)
         public static bool CheckUpdates = true;     // asks GitHub once a day whether a newer version exists
+        public static bool DuskTint = true;         // automatic mode: the Dusk colours at sunset and sunrise
 
         public static Dictionary<string, AccountProfile> Accounts = new Dictionary<string, AccountProfile>();
         public static Keys[] Hotkeys = Shortcuts.Defaults();
@@ -1239,6 +1247,7 @@ namespace Penombre
                     case "trayIconAuto": TrayIconAuto = v != "0"; break;
                     case "trayIconColor": if (int.TryParse(v, out n)) TrayIconColor = Math.Max(0, Math.Min(2, n)); break;
                     case "checkUpdates": CheckUpdates = v != "0"; break;
+                    case "duskTint": DuskTint = v != "0"; break;
                 }
             }
             return true;
@@ -1307,6 +1316,7 @@ namespace Penombre
                 "trayIconAuto=" + (TrayIconAuto ? "1" : "0"),
                 "trayIconColor=" + TrayIconColor,
                 "checkUpdates=" + (CheckUpdates ? "1" : "0"),
+                "duskTint=" + (DuskTint ? "1" : "0"),
             };
             for (int i = 0; i < Shortcuts.Count; i++) lines.Add("hotkey." + Shortcuts.SettingNames[i] + "=" + (int)Hotkeys[i]);
             foreach (var kv in Accounts)
@@ -1928,6 +1938,7 @@ namespace Penombre
 
         float shown;          // what is on screen now (0..1), moves towards the target during a fade
         float autoFactor = 1; // automatic mode (0 = day, 1 = night)
+        public bool Paused;   // "pause for 15 min…" from the menu: the filter fades out, settings unchanged
         bool layoutDirty = true, forceLook = true, quickFade, peeking;
         int peekKey;
         long peekStart;
@@ -2032,7 +2043,7 @@ namespace Penombre
                 if (peeking && ((Native.GetAsyncKeyState(peekKey) & 0x8000) == 0 || now - peekStart > 60000)) { peeking = false; quickFade = true; }
 
                 // Fade towards the target (on / off, automatic mode, peek).
-                float target = Settings.Enabled && !peeking ? autoFactor : 0;
+                float target = Settings.Enabled && !peeking && !Paused ? autoFactor : 0;
                 bool fading = shown != target;
                 if (fading)
                 {
@@ -2083,7 +2094,15 @@ namespace Penombre
             bool morphing = false;
             foreach (var o in overlays.Values)
             {
-                Mood goal = Mood.From(Settings.ParamsFor(o.Account));
+                AccountParams p = Settings.ParamsFor(o.Account);
+                Mood goal = Mood.From(p);
+                float dusk = DuskWeight();
+                if (dusk > 0)
+                {
+                    // Same intensity and vignette, the colours of the Dusk mood (strongest halfway).
+                    AccountParams warm = new AccountParams { Preset = DuskPreset, Intensity = p.Intensity, Vignette = p.Vignette, Filter = p.Filter };
+                    goal = Mood.Lerp(goal, Mood.From(warm), dusk);
+                }
                 bool changed = force;
                 if (o.Current == null) { o.Current = o.From = o.Goal = goal; changed = true; }
                 else if (!goal.Same(o.Goal)) { o.From = o.Current; o.Goal = goal; o.TransitionStart = now; }
@@ -2098,6 +2117,15 @@ namespace Penombre
                 if (changed) o.ApplyLook(Look.From(o.Current, shown));
             }
             return morphing;
+        }
+
+        const int DuskPreset = 2; // the Dusk mood
+
+        // 0 by day and by night, up to 1 halfway through dusk and dawn (automatic mode only).
+        float DuskWeight()
+        {
+            if (!Settings.Auto || !Settings.DuskTint || autoFactor <= 0 || autoFactor >= 1) return 0;
+            return 4 * autoFactor * (1 - autoFactor);
         }
 
         public void UpdateAutoFactor()
@@ -2620,7 +2648,7 @@ namespace Penombre
         Label brightV, satV, tempV, liftV, intensityV;
         Panel vColorSwatch;
         // Schedule
-        CheckBox autoBox;
+        CheckBox autoBox, duskBox;
         RadioButton fixedRadio, sunRadio;
         TimeField duskPick, nightPick, dawnPick, dayPick;
         ComboBox cityBox;
@@ -2948,6 +2976,9 @@ namespace Penombre
             Row(t, T.S("today"), sunInfo);
             Hint(t, T.S("sunHint"), 1);
             Section(t, T.S("sTransition"));
+            duskBox = Check(T.S("duskTint")); Row(t, "", duskBox);
+            Hint(t, T.S("duskHint"), 1);
+            duskBox.CheckedChanged += (s, e) => { if (!loading) { Settings.DuskTint = duskBox.Checked; Commit(); } };
             autoState = new Label { AutoSize = true, Margin = new Padding(Theme.Px(3), Theme.Px(7), Theme.Px(3), Theme.Px(3)), Font = Theme.Strong(9.5f), ForeColor = Theme.GreenHi };
             Row(t, T.S("now"), autoState);
             fade = Slider(0, 2000, 100, out fadeV);
@@ -3308,6 +3339,7 @@ namespace Penombre
             renderBox.Enabled = Mag.Ready;
 
             autoBox.Checked = Settings.Auto;
+            duskBox.Checked = Settings.DuskTint;
             fixedRadio.Checked = !Settings.SunMode;
             sunRadio.Checked = Settings.SunMode;
             duskPick.Value = At(Settings.Dusk);
@@ -3508,6 +3540,9 @@ namespace Penombre
         int currentIconKey = -1;
         ToolStripMenuItem enableItem, autoItem, presetMenu, intensityMenu, vignetteMenu, accountsMenu, updateItem;
         readonly Timer updateTimer;
+        readonly Timer pauseTimer = new Timer { Interval = 1000 };
+        DateTime pauseUntil;
+        ToolStripMenuItem pauseMenu, pauseInfo, resumeItem;
         string announced;   // version already announced in a balloon
         bool balloonIsUpdate;
         SettingsForm settingsForm;
@@ -3545,6 +3580,8 @@ namespace Penombre
             stateTimer.Tick += (s, e) => RefreshUi();
             stateTimer.Start();
 
+            pauseTimer.Tick += (s, e) => { if (DateTime.Now >= pauseUntil) Resume(); };
+
             // Update check: a moment after start, then once a day (never in the self-test).
             Updates.Changed += OnUpdates;
             tray.BalloonTipClicked += (s, e) => { if (balloonIsUpdate) Updates.OpenPage(); };
@@ -3561,6 +3598,26 @@ namespace Penombre
             if (failedHotkeys.Count > 0) tip += "\n" + T.S("noHotkeys") + FailedNames();
             balloonIsUpdate = false;
             tray.ShowBalloonTip(5000, "Pénombre " + Program.Version, tip, ToolTipIcon.None);
+        }
+
+        // Fades the filter out for a while, without touching the settings (nothing is saved).
+        public void Pause(int minutes)
+        {
+            pauseUntil = DateTime.Now.AddMinutes(minutes);
+            overlays.Paused = true;
+            pauseTimer.Start();
+            Log.Info("Paused for " + minutes + " min");
+            overlays.ApplyLook();
+            RefreshUi();
+        }
+
+        public void Resume()
+        {
+            if (!overlays.Paused) return;
+            overlays.Paused = false;
+            pauseTimer.Stop();
+            overlays.ApplyLook();
+            RefreshUi();
         }
 
         void OnUpdates()
@@ -3610,6 +3667,7 @@ namespace Penombre
             if (CommandReceived != null) CommandReceived(cmd);
             AccountProfile own = Settings.Profile(overlays.ForegroundAccount(), false);
             if (own != null && !own.Own) own = null;
+            if (overlays.Paused && cmd == Shortcuts.Toggle) { Resume(); Settings.Enabled = true; Changed(); RefreshSettings(); return; }
             switch (cmd)
             {
                 case Shortcuts.Toggle: Settings.Enabled = !Settings.Enabled; break;
@@ -3643,6 +3701,7 @@ namespace Penombre
 
         void Changed()
         {
+            if (overlays.Paused && Settings.Enabled) Resume(); // any change shows the filter again
             RegisterHotkeys();
             overlays.ApplyLook();
             Settings.SaveSoon();
@@ -3708,6 +3767,20 @@ namespace Penombre
                 vignetteMenu.DropDownItems.Add(it);
             }
 
+            pauseMenu = new ToolStripMenuItem(T.S("pause"));
+            pauseInfo = new ToolStripMenuItem { Enabled = false, Visible = false };
+            resumeItem = new ToolStripMenuItem(T.S("resume")) { Visible = false };
+            resumeItem.Click += (s, e) => Resume();
+            pauseMenu.DropDownItems.Add(pauseInfo);
+            pauseMenu.DropDownItems.Add(resumeItem);
+            foreach (int minutes in new[] { 15, 30, 60, 120 })
+            {
+                int min = minutes;
+                var it = new ToolStripMenuItem(string.Format(T.S("pauseFor"), min < 60 ? min + " min" : min / 60 + " h"));
+                it.Click += (s, e) => Pause(min);
+                pauseMenu.DropDownItems.Add(it);
+            }
+
             accountsMenu = new ToolStripMenuItem(T.S("accounts"));
             accountsMenu.DropDownItems.Add(new ToolStripMenuItem(T.S("noAccount")) { Enabled = false });
             accountsMenu.DropDownOpening += (s, e) => FillAccounts();
@@ -3735,6 +3808,7 @@ namespace Penombre
 
             menu.Items.Add(enableItem);
             menu.Items.Add(autoItem);
+            menu.Items.Add(pauseMenu);
             menu.Items.Add(new ToolStripSeparator());
             menu.Items.Add(presetMenu);
             menu.Items.Add(intensityMenu);
@@ -3749,7 +3823,7 @@ namespace Penombre
             menu.Font = Theme.Body(9.5f);
             settings.Font = Theme.Strong(9.5f);
             updateItem.Font = Theme.Strong(9.5f);
-            foreach (ToolStripMenuItem sub in new[] { presetMenu, intensityMenu, vignetteMenu, accountsMenu }) sub.DropDown.Font = menu.Font;
+            foreach (ToolStripMenuItem sub in new[] { pauseMenu, presetMenu, intensityMenu, vignetteMenu, accountsMenu }) sub.DropDown.Font = menu.Font;
             tray.ContextMenuStrip = menu;
         }
 
@@ -3790,7 +3864,8 @@ namespace Penombre
         {
             float f = Settings.Auto ? DayCycle.Factor(DateTime.Now) : 1;
             string state;
-            if (!Settings.Enabled) state = T.S("off");
+            if (overlays.Paused) state = string.Format(T.S("pauseUntil"), pauseUntil.ToString("HH:mm"));
+            else if (!Settings.Enabled) state = T.S("off");
             else
             {
                 state = Preset.NameOf(Settings.PresetIndex) + " " + Settings.Intensity + " %";
@@ -3799,12 +3874,12 @@ namespace Penombre
             string text = "Pénombre : " + state + " · " + overlays.Count + " " + T.S("windows");
             tray.Text = text.Length > 63 ? text.Substring(0, 63) : text;
 
-            TrayState now = !Settings.Enabled ? TrayState.Off : f <= 0 ? TrayState.Day : f >= 1 ? TrayState.Night : TrayState.Twilight;
+            TrayState now = !Settings.Enabled || overlays.Paused ? TrayState.Off : f <= 0 ? TrayState.Day : f >= 1 ? TrayState.Night : TrayState.Twilight;
             currentState = now;
             // The icon shows the sky of the schedule (Horaires), even when the filter does not follow it.
             float sky = DayCycle.Factor(DateTime.Now);
             TrayState skyState = sky <= 0 ? TrayState.Day : sky >= 1 ? TrayState.Night : TrayState.Twilight;
-            int picture = !Settings.Enabled ? TrayIcons.Off : !Settings.TrayIconAuto ? Settings.TrayIconColor : StateOf(skyState);
+            int picture = !Settings.Enabled || overlays.Paused ? TrayIcons.Off : !Settings.TrayIconAuto ? Settings.TrayIconColor : StateOf(skyState);
             int key = Settings.TrayIcon * TrayIcons.StateCount + picture;
             if (key != currentIconKey)
             {
@@ -3818,7 +3893,10 @@ namespace Penombre
                 tray.Icon = icon;
             }
 
-            enableItem.Checked = Settings.Enabled;
+            enableItem.Checked = Settings.Enabled && !overlays.Paused;
+            pauseMenu.Checked = overlays.Paused;
+            pauseInfo.Visible = resumeItem.Visible = overlays.Paused;
+            if (overlays.Paused) pauseInfo.Text = string.Format(T.S("pauseUntil"), pauseUntil.ToString("HH:mm"));
             autoItem.Checked = Settings.Auto;
             enableItem.ShortcutKeyDisplayString = HotkeyText(Shortcuts.Toggle);
             autoItem.ShortcutKeyDisplayString = HotkeyText(Shortcuts.Auto);
@@ -3869,6 +3947,7 @@ namespace Penombre
         {
             stateTimer.Dispose();
             updateTimer.Dispose();
+            pauseTimer.Dispose();
             Updates.Changed -= OnUpdates;
             if (settingsForm != null && !settingsForm.IsDisposed) settingsForm.Dispose();
             hotkeys.Dispose();

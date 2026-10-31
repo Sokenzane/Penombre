@@ -77,7 +77,7 @@ Dofus doit être en mode **fenêtré** ou **plein écran fenêtré** : en plein 
 
 ## Utilisation
 
-Lance `Penombre.exe` : un œuf de lune apparaît dans la zone de notification (près de l'horloge, parfois cachée derrière la flèche `^`). Clic gauche dessus pour activer ou couper le filtre, clic droit pour le menu. Relancer `Penombre.exe` alors qu'il tourne déjà ouvre la fenêtre de réglages.
+Lance `Penombre.exe` : un œuf de lune apparaît dans la zone de notification (près de l'horloge, parfois cachée derrière la flèche `^`). Clic gauche dessus pour activer ou couper le filtre, clic droit pour le menu. **Pause** (dans le menu) coupe le filtre pendant 15 min, 30 min, 1 h ou 2 h, puis le remet tout seul ; `Ctrl+Alt+N` ou « Reprendre maintenant » le remettent plus tôt. Relancer `Penombre.exe` alors qu'il tourne déjà ouvre la fenêtre de réglages.
 
 ### Raccourcis
 
@@ -104,7 +104,7 @@ Menu **Réglages…**. La fenêtre reprend l'esprit de l'interface de Dofus 3 : 
 | Onglet | Contenu |
 | --- | --- |
 | Ambiance | aperçu en direct (une partie du jeu sans et avec le filtre), ambiances en vignettes, curseurs de l'ambiance personnalisée, intensité, vignettage et sa teinte, grain pellicule, rendu |
-| Horaires | mode automatique (horaires fixes ou vrai soleil), durée des transitions (0 à 2 s) |
+| Horaires | mode automatique (horaires fixes ou vrai soleil), teinte de crépuscule, durée des transitions (0 à 2 s) |
 | Comptes | réglages par compte |
 | Affichage | icône de la zone de notification, zones claires, « seulement quand Dofus est au premier plan » |
 | Raccourcis | tous les raccourcis, personnalisables |
@@ -142,6 +142,8 @@ Le filtre suit l'heure de ton PC, avec deux façons de régler les horaires :
 | Nuit complète | 21:30 | plein effet |
 | Début de l'aube | 06:30 | redescend progressivement |
 | Jour complet | 08:30 | aucun (shader suspendu) |
+
+**Teinte de crépuscule** (onglet Horaires, activée par défaut) : pendant que la nuit tombe et que le jour se lève, le filtre prend les couleurs chaudes de l'ambiance Crépuscule, au plus fort à mi-chemin, puis revient à ton ambiance de nuit. C'est l'effet « la nuit tombe » de Dofus 1.29.
 
 ### Zones claires
 
