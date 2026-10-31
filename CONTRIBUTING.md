@@ -22,7 +22,7 @@ Ouvre un [ticket](https://github.com/Sokenzane/Penombre/issues/new/choose). Pour
 
 Double-clique sur `build.bat` (ou lance `build.bat ci` pour éviter la pause finale). Il compile `src/Penombre.cs` et `src/Interface.cs` en `dist/Penombre.exe` (64 bits) avec le compilateur C# fourni avec .NET Framework 4 : rien à installer.
 
-`--lang=fr|en` force la langue, `--data=<dossier>` range les réglages et le journal dans un autre dossier.
+`--lang=fr|en|es` force la langue, `--data=<dossier>` range les réglages et le journal dans un autre dossier.
 
 ## Self-test
 
@@ -42,7 +42,7 @@ Avec Dofus 3 ouvert sur une jolie carte, double-clique sur `tools\shots.bat` et 
 - **Aucune dépendance.** L'appli est dans `src/Penombre.cs`, ses contrôles dessinés à la main et ses couleurs dans `src/Interface.cs`. WinForms, GDI+ et Win32 (P/Invoke) uniquement. Les ressources intégrées (icônes, police Nunito) sont listées dans `build.bat`.
 - **Icônes.** Modifie `tools/make_icon.py` et lance-le (Pillow et Playwright) : il réécrit `assets/penombre.ico`, `assets/logo.png` et `assets/tray-icons.png`, sans métadonnées.
 - **Pixels physiques.** Le processus gère le DPI par écran : toutes les coordonnées sont en pixels physiques.
-- **Aucun texte d'interface en dur** : chaque texte est dans `T` (anglais et français).
+- **Aucun texte d'interface en dur** : chaque texte est dans `T`, en anglais, français et espagnol.
 - **Les réglages** passent par la classe `Settings` (`%APPDATA%\Penombre\settings.ini`) ; garde un petit fichier clé=valeur.
 - **Les erreurs** vont dans le journal (`Log.Error`), jamais dans une boîte de message en boucle.
 - Code et commentaires en anglais, indentation de 4 espaces, fins de ligne CRLF (gérées par `.editorconfig` et `.gitattributes`).
@@ -59,10 +59,10 @@ Pénombre doit rester un simple calque par-dessus le jeu. Les pull requests qui 
 ## Ajouter une langue
 
 1. Dans `src/Penombre.cs`, trouve `static class T`.
-2. Ajoute une colonne à chaque entrée de `texts` et choisis-la dans `S()` pour le code de ta langue sur deux lettres (par exemple `"es"`).
+2. Ajoute une colonne à chaque entrée de `texts` (après l'anglais, le français et l'espagnol) et choisis-la dans `Init()` pour le code de ta langue sur deux lettres (par exemple `"de"`). Une entrée sans ta colonne s'affiche en anglais.
 3. Garde les marqueurs `{0}`.
-4. Teste avec `dist\Penombre.exe --lang=es`, ouvre les réglages et l'éditeur de zones, et vérifie que rien n'est coupé.
-5. Mentionne la langue dans le README.
+4. Teste avec `dist\Penombre.exe --lang=de`, ouvre les réglages et l'éditeur de zones, et vérifie que rien n'est coupé.
+5. Ajoute un `README.de.md` traduit et un lien vers lui en haut des autres README.
 
 ## Pull requests
 
