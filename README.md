@@ -20,6 +20,10 @@
 </p>
 
 <p align="center">
+  <b>Français</b> · <a href="README.en.md">English</a> · <a href="README.es.md">Español</a>
+</p>
+
+<p align="center">
   <img src="assets/readme/banner.jpg" alt="Une carte d'Astrub sans filtre à gauche, et avec Pénombre (Nuit bleutée) à droite">
 </p>
 
