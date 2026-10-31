@@ -651,22 +651,29 @@ namespace Penombre
                                   text, TextFormatFlags.VerticalCenter | TextFormatFlags.Left | TextFormatFlags.EndEllipsis);
         }
 
+        protected override void OnEnabledChanged(EventArgs e) { base.OnEnabledChanged(e); Invalidate(); }
+
+        // The closed box is drawn entirely here, enabled or not: the system draws a light grey
+        // box for a disabled list, whatever its colors.
         protected override void WndProc(ref Message m)
         {
             base.WndProc(ref m);
             if (m.Msg != WM_PAINT) return;
-            // Redraw the frame and the arrow over the system ones.
             using (Graphics g = Graphics.FromHwnd(Handle))
             {
-                g.SmoothingMode = SmoothingMode.AntiAlias;
+                var r = new Rectangle(0, 0, Width, Height);
+                using (var b = new SolidBrush(Enabled ? Theme.Field : Color.FromArgb(0x26, 0x25, 0x2d))) g.FillRectangle(b, r);
                 int w = Theme.Px(22);
-                var arrow = new Rectangle(Width - w - 1, 1, w, Height - 2);
-                using (var b = new SolidBrush(Theme.Field)) g.FillRectangle(b, arrow);
-                float cx = arrow.X + arrow.Width / 2f, cy = Height / 2f, a = Theme.Px(4);
+                string text = SelectedIndex >= 0 ? GetItemText(SelectedItem) : "";
+                TextRenderer.DrawText(g, text, Font, new Rectangle(Theme.Px(6), 0, Width - w - Theme.Px(8), Height),
+                                      Enabled ? Theme.Text : Theme.Muted, TextFormatFlags.VerticalCenter | TextFormatFlags.Left | TextFormatFlags.EndEllipsis);
+                g.SmoothingMode = SmoothingMode.AntiAlias;
+                float cx = Width - w / 2f - 1, cy = Height / 2f, a = Theme.Px(4);
                 using (var pen = new Pen(Enabled ? Theme.GreenHi : Theme.Muted, Theme.Px(2)) { StartCap = LineCap.Round, EndCap = LineCap.Round })
                     g.DrawLines(pen, new[] { new PointF(cx - a, cy - a / 2), new PointF(cx, cy + a / 2), new PointF(cx + a, cy - a / 2) });
                 g.SmoothingMode = SmoothingMode.None;
-                using (var pen = new Pen(Focused ? Theme.GreenHi : Color.FromArgb(0x5a, 0x58, 0x66))) g.DrawRectangle(pen, 0, 0, Width - 1, Height - 1);
+                Color border = !Enabled ? Theme.Line : Focused ? Theme.GreenHi : Color.FromArgb(0x5a, 0x58, 0x66);
+                using (var pen = new Pen(border)) g.DrawRectangle(pen, 0, 0, Width - 1, Height - 1);
             }
         }
     }

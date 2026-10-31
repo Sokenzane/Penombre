@@ -16,7 +16,10 @@
 - New **notification area icons**: a moon egg that changes with the sky (default), a watcher egg that sleeps by day, or a round moon; chosen in Display
 - New icon and logo (the moon egg)
 - Times are typed in a dark time field; the tray menu uses the same colors
-- The self-test checks the new pages, the fonts and the 36 notification icon pictures
+- The self-test checks the new pages, the fonts and the 36 notification icon pictures, and that two accounts with the same settings get the same tint
+- Starting Pénombre again while it is running opens its settings window
+- Accounts section: changing the mood, intensity or vignette of a character turns on its own settings right away (the controls were greyed out until the box was ticked)
+- Fixed: a very thin window above Dofus (a tab handle of a window grouping tool, for example) cut a band in the filter
 
 ## 0.4.0
 

@@ -61,6 +61,7 @@ namespace Penombre
         public const string Version = "0.5.0";
         public static bool SelfTestMode;   // test build only (src/SelfTest.cs)
         public static string DataOverride; // --data=<folder>: settings and log elsewhere
+        public static string InstanceName { get { return SelfTestMode ? "Sokenzane.Penombre.SelfTest" : "Sokenzane.Penombre"; } }
         static bool errorShown;
 
         static partial void RunSelfTest(TrayApp app);
@@ -78,11 +79,18 @@ namespace Penombre
             T.Init(lang);
 
             bool first;
-            using (var mutex = new System.Threading.Mutex(true, SelfTestMode ? "Sokenzane.Penombre.SelfTest" : "Sokenzane.Penombre", out first))
+            using (var mutex = new System.Threading.Mutex(true, InstanceName, out first))
             {
                 if (!first)
                 {
-                    MessageBox.Show(T.S("already"), "Pénombre", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    // Started again: the running Pénombre opens its settings window.
+                    IntPtr running = Native.FindWindowEx(new IntPtr(-3) /* HWND_MESSAGE */, IntPtr.Zero, null, HotkeyWindow.Caption);
+                    if (running != IntPtr.Zero)
+                    {
+                        Native.AllowSetForegroundWindow(-1 /* ASFW_ANY */);
+                        Native.PostMessage(running, HotkeyWindow.WM_SHOW_SETTINGS, IntPtr.Zero, IntPtr.Zero);
+                    }
+                    else MessageBox.Show(T.S("already"), "Pénombre", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
 
@@ -241,6 +249,8 @@ namespace Penombre
         [DllImport("dwmapi.dll")] public static extern int DwmGetWindowAttribute(IntPtr h, int attr, out int value, int size);
         [DllImport("ntdll.dll")] public static extern int RtlGetVersion(ref OSVERSIONINFOEX v);
         [DllImport("user32.dll")] public static extern bool PostMessage(IntPtr h, int msg, IntPtr w, IntPtr l);
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)] public static extern IntPtr FindWindowEx(IntPtr parent, IntPtr after, string cls, string title);
+        [DllImport("user32.dll")] public static extern bool AllowSetForegroundWindow(int processId);
         [DllImport("user32.dll")] public static extern uint GetQueueStatus(uint flags);
         [DllImport("user32.dll")] public static extern bool UpdateWindow(IntPtr h);
 
@@ -507,6 +517,7 @@ namespace Penombre
             { "offline",    new[] { "(not open)", "(pas ouvert)" } },
             { "accFilter",  new[] { "Filter this account", "Filtrer ce compte" } },
             { "accOwn",     new[] { "Use its own settings", "Utiliser des réglages propres" } },
+            { "ownHint",    new[] { "Changing one of these gives this character its own settings.", "Changer l'un de ces réglages donne à ce personnage ses propres réglages." } },
             { "accForget",  new[] { "Forget this account", "Oublier ce compte" } },
             { "accHint",    new[] { "Characters are recognized from the Dofus window title. Shortcuts change the settings of the Dofus in the foreground.",
                                     "Les personnages sont reconnus au titre de la fenêtre Dofus. Les raccourcis modifient les réglages du Dofus au premier plan." } },
@@ -1670,15 +1681,21 @@ namespace Penombre
 
     // ================================================================ Global shortcuts
 
+    // Receives the global shortcuts, and the request to open the settings sent when Pénombre is started again.
     class HotkeyWindow : NativeWindow, IDisposable
     {
+        public const int WM_SHOW_SETTINGS = 0x8000 + 0x50; // WM_APP + 0x50
+        public static string Caption { get { return Program.InstanceName + ".Messages"; } }
         readonly Action<int> callback;
+        readonly Action showSettings;
         readonly List<int> ids = new List<int>();
 
-        public HotkeyWindow(Action<int> callback)
+        public HotkeyWindow(Action<int> callback, Action showSettings)
         {
             this.callback = callback;
+            this.showSettings = showSettings;
             var cp = new CreateParams();
+            cp.Caption = Caption;
             cp.Parent = new IntPtr(-3); // HWND_MESSAGE
             CreateHandle(cp);
         }
@@ -1700,6 +1717,7 @@ namespace Penombre
         protected override void WndProc(ref Message m)
         {
             if (m.Msg == 0x0312 /* WM_HOTKEY */) callback(m.WParam.ToInt32());
+            else if (m.Msg == WM_SHOW_SETTINGS) showSettings();
             base.WndProc(ref m);
         }
 
@@ -2143,8 +2161,8 @@ namespace Penombre
             "MultitaskingViewFrame", "ForegroundStaging"            // Alt+Tab, task switching
         };
 
-        // A window that hides what is below it. Click-through and fully transparent windows
-        // (GPU / Discord / Steam overlays...) and cloaked windows do not count.
+        // A window that hides what is below it. Click-through, fully transparent, cloaked
+        // and very thin windows (GPU / Discord / Steam overlays, tab handles...) do not count.
         public static bool IsOccluder(IntPtr h, out Rectangle r)
         {
             r = Rectangle.Empty;
@@ -2159,7 +2177,8 @@ namespace Penombre
                     return false;
             }
             if (Native.IsCloaked(h)) return false;
-            return Native.TryGetBounds(h, out r);
+            // thin strips (window tab handles, edge decorations) hide almost nothing
+            return Native.TryGetBounds(h, out r) && r.Width >= 12 && r.Height >= 12;
         }
 
         // Settings changed: moods are followed on the next tick; refresh the rest now.
@@ -2888,6 +2907,7 @@ namespace Penombre
             accFilter = Check(T.S("accFilter")); Row(t, "", accFilter);
             accOwn = Check(T.S("accOwn")); Row(t, "", accOwn);
             Section(t, T.S("sOwn"));
+            Hint(t, T.S("ownHint"), 0);
             accPreset = Combo(240);
             for (int i = 0; i < Preset.Count; i++) accPreset.Items.Add(Preset.NameOf(i));
             Row(t, T.S("mood"), accPreset);
@@ -2902,10 +2922,23 @@ namespace Penombre
 
             accountList.SelectedIndexChanged += (s, e) => { if (!loading) LoadAccount(); };
             accFilter.CheckedChanged += (s, e) => { if (!loading) EditAccount(p => p.Filter = accFilter.Checked); };
-            accOwn.CheckedChanged += (s, e) => { if (!loading) EditAccount(p => p.Own = accOwn.Checked); };
-            accPreset.SelectedIndexChanged += (s, e) => { if (!loading) EditAccount(p => p.Preset = accPreset.SelectedIndex); };
-            accIntensity.ValueChanged += (s, e) => { if (!loading) EditAccount(p => p.Intensity = accIntensity.Value); };
-            accVignette.SelectedIndexChanged += (s, e) => { if (!loading) EditAccount(p => p.Vignette = accVignette.SelectedIndex); };
+            // Own settings start from what is shown (the default ones); touching one of them turns them on.
+            Action<AccountProfile> takeShown = p =>
+            {
+                p.Preset = accPreset.SelectedIndex;
+                p.Intensity = accIntensity.Value;
+                p.Vignette = accVignette.SelectedIndex;
+            };
+            accOwn.CheckedChanged += (s, e) => { if (!loading) EditAccount(p => { if (accOwn.Checked) takeShown(p); p.Own = accOwn.Checked; }); };
+            EventHandler ownChanged = (s, e) =>
+            {
+                if (loading) return;
+                EditAccount(p => { takeShown(p); p.Own = true; });
+                loading = true; accOwn.Checked = true; loading = false;
+            };
+            accPreset.SelectedIndexChanged += ownChanged;
+            accIntensity.ValueChanged += ownChanged;
+            accVignette.SelectedIndexChanged += ownChanged;
             accForget.Click += (s, e) =>
             {
                 var item = accountList.SelectedItem as AccountItem;
@@ -3197,7 +3230,7 @@ namespace Penombre
             accVignette.SelectedIndex = p != null && p.Own ? p.Vignette : Settings.Vignette;
             loading = false;
             accFilter.Enabled = accOwn.Enabled = has;
-            accPreset.Enabled = accIntensity.Enabled = accVignette.Enabled = has && accOwn.Checked;
+            accPreset.Enabled = accIntensity.Enabled = accVignette.Enabled = has;
             accForget.Enabled = p != null;
             UpdateLabels();
         }
@@ -3211,7 +3244,6 @@ namespace Penombre
             Commit();
             int i = accountList.SelectedIndex;
             loading = true; accountList.Items[i] = accountList.Items[i]; loading = false; // refresh the label
-            accPreset.Enabled = accIntensity.Enabled = accVignette.Enabled = accOwn.Checked;
             accForget.Enabled = true;
         }
 
@@ -3323,7 +3355,7 @@ namespace Penombre
                 if (settingsForm != null && !settingsForm.IsDisposed) settingsForm.RefreshAccounts();
             };
 
-            hotkeys = new HotkeyWindow(id => Command(id - 1));
+            hotkeys = new HotkeyWindow(id => Command(id - 1), OpenSettings);
             RegisterHotkeys();
 
             // The icon and the tooltip follow the automatic mode.

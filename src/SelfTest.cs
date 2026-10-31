@@ -256,6 +256,43 @@ namespace Penombre
 
         // Bands of the game area away from the center and from the bottom UI, skipping the ones
         // under another window (that window may not show in a screen capture).
+        // Average red, green and blue of the same bands as Scene().
+        double[] SceneRgb()
+        {
+            List<Rectangle> above = OccluderRects(o.Target);
+            var sum = new double[3]; int n = 0;
+            foreach (Rectangle band in new[] { Part(0.04f, 0.12f, 0.24f, 0.45f), Part(0.72f, 0.12f, 0.24f, 0.45f), Part(0.30f, 0.62f, 0.18f, 0.18f) })
+            {
+                bool free = true;
+                foreach (Rectangle r in above) if (r.IntersectsWith(band)) free = false;
+                if (!free) continue;
+                using (var bmp = new Bitmap(band.Width, band.Height, PixelFormat.Format32bppArgb))
+                {
+                    using (var g = Graphics.FromImage(bmp))
+                    {
+                        IntPtr dst = g.GetHdc();
+                        IntPtr src = Native.GetDC(IntPtr.Zero);
+                        BitBlt(dst, 0, 0, band.Width, band.Height, src, band.X, band.Y, 0x00CC0020 | 0x40000000);
+                        Native.ReleaseDC(IntPtr.Zero, src);
+                        g.ReleaseHdc(dst);
+                    }
+                    BitmapData data = bmp.LockBits(new Rectangle(0, 0, band.Width, band.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+                    var px = new int[band.Width * band.Height];
+                    Marshal.Copy(data.Scan0, px, 0, px.Length);
+                    bmp.UnlockBits(data);
+                    for (int i = 0; i < px.Length; i += 7)
+                    {
+                        sum[0] += (px[i] >> 16) & 255; sum[1] += (px[i] >> 8) & 255; sum[2] += px[i] & 255;
+                        n++;
+                    }
+                }
+            }
+            if (n > 0) for (int c = 0; c < 3; c++) sum[c] /= n;
+            return sum;
+        }
+
+        static string Rgb(double[] v) { return v[0].ToString("0.00") + "/" + v[1].ToString("0.00") + "/" + v[2].ToString("0.00"); }
+
         double Scene()
         {
             List<Rectangle> above = OccluderRects(o.Target);
@@ -694,6 +731,36 @@ namespace Penombre
                 CheckStable(a.Account, lumA);
                 CheckStable(b.Account, lumB);
             }, 100);
+
+            // Same settings must give the same tint: the filter changes red, green and blue of each
+            // window by the same ratios (measured filter on / filter off, each window in front).
+            double[] onA = null, offA = null, onB = null, offB = null;
+            int savedFade = 0;
+            Add("multi-account: tint, first account", () =>
+            {
+                if (!multi) return;
+                savedFade = Settings.FadeMs; Settings.FadeMs = 0; app.NotifyChanged();
+                o = a; Front(a.Target);
+            }, 1000);
+            Add("multi-account: tint, first account off", () => { if (!multi) return; onA = SceneRgb(); Settings.Enabled = false; app.NotifyChanged(); }, 700);
+            Add("multi-account: tint, second account", () => { if (!multi) return; offA = SceneRgb(); Settings.Enabled = true; app.NotifyChanged(); o = b; Front(b.Target); }, 1000);
+            Add("multi-account: tint, second account off", () => { if (!multi) return; onB = SceneRgb(); Settings.Enabled = false; app.NotifyChanged(); }, 700);
+            Add("multi-account: tint checks", () =>
+            {
+                if (!multi) return;
+                offB = SceneRgb();
+                Settings.Enabled = true; Settings.FadeMs = savedFade; app.NotifyChanged();
+                double worst = 0;
+                var ra = new double[3]; var rb = new double[3];
+                for (int c = 0; c < 3; c++)
+                {
+                    ra[c] = onA[c] / Math.Max(1, offA[c]); rb[c] = onB[c] / Math.Max(1, offB[c]);
+                    worst = Math.Max(worst, Math.Abs(ra[c] - rb[c]));
+                }
+                Check("same settings give the same tint on both accounts", worst < 0.06,
+                      a.Account + " " + Rgb(ra) + " vs " + b.Account + " " + Rgb(rb) + " (filtered / unfiltered, red/green/blue)");
+                o = a; Front(a.Target);
+            }, 1000);
 
             // Exception on one account
             Add("multi-account: exception", () =>
