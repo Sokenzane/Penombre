@@ -7,6 +7,8 @@ Reads dist/shots/ and writes, in assets/readme/:
   banner.jpg      the game without and with Pénombre, side by side
   moods.jpg       the game without filter and with each mood
   settings-*.png  settings pages (Mood, Display)
+and dist/social-preview.jpg, the 1280 x 640 picture shown when the repository link is shared
+(GitHub: Settings > General > Social preview).
 
 Only the scene is kept: the game interface (chat, spells, map) is cropped out.
 Files are written by Pillow without any metadata.
@@ -99,11 +101,41 @@ def settings() -> None:
         Image.frombytes("RGB", img.size, img.tobytes()).save(OUT / f"settings-{name}.png", optimize=True)
 
 
+def social() -> None:
+    off, on = scene("game-off"), scene(f"game-mood{BANNER_MOOD}")
+    w, h = off.size
+    # 2:1, centred on the scene
+    ch = min(h, w // 2)
+    cw = ch * 2
+    box = ((w - cw) // 2, (h - ch) // 2, (w - cw) // 2 + cw, (h - ch) // 2 + ch)
+    left, right = off.crop(box).resize((1280, 640), Image.LANCZOS), on.crop(box).resize((1280, 640), Image.LANCZOS)
+    out = left.copy()
+    out.paste(right.crop((640, 0, 1280, 640)), (640, 0))
+    # a dark band in the middle for the title, the split line above and below it
+    shade = Image.new("L", out.size, 0)
+    ImageDraw.Draw(shade).rounded_rectangle((250, 205, 1030, 435), radius=28, fill=200)
+    shade = shade.filter(ImageFilter.GaussianBlur(30))
+    out = Image.composite(Image.new("RGB", out.size, BACK), out, shade)
+    draw = ImageDraw.Draw(out)
+    draw.rectangle((639, 0, 641, 190), fill=GREEN)
+    draw.rectangle((639, 450, 641, 640), fill=GREEN)
+    logo = Image.open(ROOT / "assets" / "logo.png").convert("RGBA").resize((170, 170), Image.LANCZOS)
+    out.paste(logo, (300, 235), logo)
+    label(draw, (490, 300), "Pénombre", 96, TEXT, anchor="lm")
+    label(draw, (494, 378), "Le mode nuit de Dofus 3", 36, GREEN, anchor="lm")
+    pill(out, (24, 22), "SANS", 24, TEXT)
+    pill(out, (1280 - 24, 22), "AVEC PÉNOMBRE", 24, GREEN, right=True)
+    dist = ROOT / "dist"
+    out.save(dist / "social-preview.jpg", quality=90, optimize=True, progressive=True)  # GitHub takes up to 1 MB
+    print(f"Written: {dist / 'social-preview.jpg'}")
+
+
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     banner()
     moods()
     settings()
+    social()
     for f in sorted(OUT.iterdir()):
         print(f"Written: {f} ({f.stat().st_size // 1024} KB)")
 
