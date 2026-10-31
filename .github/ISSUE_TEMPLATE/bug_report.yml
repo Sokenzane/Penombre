@@ -1,0 +1,56 @@
+name: Bug report
+description: Something does not work as expected
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, what happened instead?
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Pénombre version
+      placeholder: e.g. 0.3.0 (right-click Penombre.exe > Properties > Details)
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version
+      placeholder: e.g. Windows 10 22H2, Windows 11 24H2
+    validations:
+      required: true
+  - type: dropdown
+    id: render
+    attributes:
+      label: Renderer
+      options:
+        - Shader
+        - Veil
+        - Both
+  - type: textarea
+    id: setup
+    attributes:
+      label: Setup
+      description: Number of Dofus clients, windowed or fullscreen windowed, screens (count, resolution, scaling).
+      placeholder: e.g. 2 clients, fullscreen windowed, 2 screens 1920×1080 at 100 % and 2560×1440 at 125 %
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostics
+      description: Tray menu > Copy diagnostics, then paste here. It contains your window titles (character names) — replace them with XXX if you prefer.
+      render: text
+  - type: textarea
+    id: log
+    attributes:
+      label: Log
+      description: Tray menu > Open the log, then paste the last lines (especially ERROR lines).
+      render: text
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: Drag and drop images here if useful.
