@@ -7,6 +7,7 @@ Merci de ton intérêt ! Pénombre est un petit projet : deux fichiers sources, 
 - [Signaler un bug ou proposer une idée](#signaler-un-bug-ou-proposer-une-idée)
 - [Compiler](#compiler)
 - [Self-test](#self-test)
+  - [Images du README](#images-du-readme)
 - [Règles de code](#règles-de-code)
 - [Règles pour tout ce qui touche au jeu](#règles-pour-tout-ce-qui-touche-au-jeu)
 - [Ajouter une langue](#ajouter-une-langue)
@@ -30,6 +31,10 @@ Avec Dofus 3 ouvert (un personnage connecté, ou deux pour le multi-compte, en f
 Le test pilote la vraie appli par-dessus le jeu et mesure l'assombrissement à l'écran : rendus, fondu, transitions d'ambiance, réglages par compte, zones claires, vignettage, grain, mode automatique, horaires du soleil, enregistrement des raccourcis, export / import, mode portable, lancement au démarrage (remis comme avant), fenêtre de réglages, multi-compte, performances. Mets Dofus au premier plan quand c'est demandé, puis suis les lignes `MANUAL` de `dist\selftest-data\selftest-progress.txt` (raccourcis, coup d'œil, une fenêtre par-dessus Dofus, seulement au premier plan). Ne touche pas au jeu pendant le reste du test : un compte inactif assombrit lui-même son écran et fausse les mesures.
 
 Résultats : `dist\selftest-data\selftest-report.txt` (avec les captures `snap-*.png` et `settings-tab*.png`). Toutes les lignes doivent être `PASS`.
+
+### Images du README
+
+Avec Dofus 3 ouvert sur une jolie carte, double-clique sur `tools\shots.bat` et ne touche à rien pendant une vingtaine de secondes : il prend en pleine résolution le jeu sans filtre, avec chaque ambiance, et chaque page des réglages (`dist\shots`). Puis `python tools/readme_images.py` (Pillow) en tire la bannière, la planche des ambiances et les captures des réglages dans `assets/readme/`, sans l'interface du jeu ni métadonnées. Vérifie qu'aucun nom de personnage ne reste visible avant de les publier.
 
 ## Règles de code
 

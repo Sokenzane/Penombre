@@ -6,6 +6,9 @@
 // darkening on screen and writes selftest-progress.txt / selftest-report.txt in the data folder.
 // Some phases need a human (or a remote tester) to press shortcuts or switch windows: the
 // progress file says what to do and when.
+//
+// With --shots, it only takes the full-size pictures used by the README instead (game without
+// filter, each mood, each settings page), in the data folder.
 
 using System;
 using System.Collections.Generic;
@@ -101,7 +104,7 @@ namespace Penombre
             Progress("Pénombre " + Program.Version + " self-test - " + Program.WindowsVersion());
             app.CommandReceived += cmd => commands.Add(cmd);
             sampler.Tick += (s, e) => TakeSample();
-            Plan();
+            if (Array.IndexOf(Environment.GetCommandLineArgs(), "--shots") >= 0) PlanShots(); else Plan();
             timer.Tick += (s, e) => Pump();
             timer.Start();
             sampler.Start();
@@ -376,6 +379,78 @@ namespace Penombre
             Settings.FadeMs = 300; Settings.Accounts.Clear(); Settings.Hotkeys = Shortcuts.Defaults();
             Settings.VignetteColor = Settings.DefaultVignetteColor;
             app.NotifyChanged();
+        }
+
+        // ------------------------------------------------------------ README pictures
+
+        // Saves a screen rectangle at full size, layered windows included.
+        void Shot(Rectangle r, string name)
+        {
+            try
+            {
+                using (var bmp = new Bitmap(r.Width, r.Height, PixelFormat.Format32bppArgb))
+                {
+                    using (var g = Graphics.FromImage(bmp))
+                    {
+                        IntPtr dst = g.GetHdc();
+                        IntPtr src = Native.GetDC(IntPtr.Zero);
+                        BitBlt(dst, 0, 0, r.Width, r.Height, src, r.X, r.Y, 0x00CC0020 | 0x40000000);
+                        Native.ReleaseDC(IntPtr.Zero, src);
+                        g.ReleaseHdc(dst);
+                    }
+                    bmp.Save(Path.Combine(dir, name + ".png"), ImageFormat.Png);
+                }
+                Progress("  saved " + name + ".png");
+            }
+            catch (Exception ex) { Progress("  (" + name + " failed: " + ex.Message + ")"); }
+        }
+
+        void PlanShots()
+        {
+            Add("defaults", () =>
+            {
+                Defaults();
+                Settings.FadeMs = 0; Settings.Vignette = 1;
+                Settings.Enabled = false; app.NotifyChanged();
+            }, 200);
+            AddUntil("waiting for a Dofus 3 window", null, () => FindOverlay() != null, 20000);
+            Add("game window", () => { o = FindOverlay(); Front(o.Target); }, 1500);
+            Add("game without filter", () =>
+            {
+                Front(o.Target);
+                Native.TryGetClientOnScreen(o.Target, out area);
+                Shot(area, "game-off");
+                Settings.Enabled = true; app.NotifyChanged();
+            }, 1000);
+            for (int i = 0; i < Preset.All.Length; i++)
+            {
+                int idx = i;
+                Add("mood " + idx, () => { Settings.PresetIndex = idx; app.NotifyChanged(); }, 1200);
+                Add("mood " + idx + ": picture", () => Shot(area, "game-mood" + idx), 100);
+            }
+            SettingsForm form = null;
+            Add("settings window", () =>
+            {
+                Settings.PresetIndex = 0; app.NotifyChanged();
+                form = new SettingsForm(m, app.NotifyChanged, () => app.FailedHotkeys);
+                form.StartPosition = FormStartPosition.Manual;
+                form.Location = new Point(area.X + (area.Width - form.Width) / 2, area.Y + (area.Height - form.Height) / 2);
+                form.TopMost = true; // above the game, even when Windows refuses to bring it to the front
+                form.Show();
+            }, 1500);
+            for (int i = 0; i < 6; i++)
+            {
+                int idx = i;
+                Add("settings page " + (idx + 1), () =>
+                {
+                    if (form.WindowState == FormWindowState.Minimized) form.WindowState = FormWindowState.Normal;
+                    form.Activate();
+                    form.SelectPage(idx);
+                    if (idx == 0) form.RefreshPreview();
+                }, 1200);
+                Add("settings page " + (idx + 1) + ": picture", () => Shot(form.Bounds, "settings" + (idx + 1)), 100);
+            }
+            Add("close", () => { form.Close(); form.Dispose(); }, 300);
         }
 
         // ------------------------------------------------------------ the plan

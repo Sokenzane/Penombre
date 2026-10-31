@@ -19,6 +19,10 @@
   <a href="https://github.com/Sokenzane/Penombre/releases/latest/download/Penombre.exe"><b>Télécharger Penombre.exe</b></a>
 </p>
 
+<p align="center">
+  <img src="assets/readme/banner.jpg" alt="Une carte d'Astrub sans filtre à gauche, et avec Pénombre (Nuit bleutée) à droite">
+</p>
+
 ## Sommaire
 
 - [C'est quoi ?](#cest-quoi-)
@@ -91,6 +95,11 @@ Chaque raccourci se change dans **Réglages… > Raccourcis** (clique dans une c
 
 Menu **Réglages…**. La fenêtre reprend l'esprit de l'interface de Dofus 3 : rubriques à gauche, curseurs et boutons verts. Tout s'applique en direct, avec une transition douce :
 
+<p align="center">
+  <img src="assets/readme/settings-mood.png" width="49%" alt="Rubrique Ambiance : aperçu sans et avec Pénombre, vignettes des ambiances, curseurs">
+  <img src="assets/readme/settings-display.png" width="49%" alt="Rubrique Affichage : choix de l'icône, zones claires">
+</p>
+
 | Onglet | Contenu |
 | --- | --- |
 | Ambiance | aperçu en direct (une partie du jeu sans et avec le filtre), ambiances en vignettes, curseurs de l'ambiance personnalisée, intensité, vignettage et sa teinte, grain pellicule, rendu |
@@ -103,6 +112,10 @@ Menu **Réglages…**. La fenêtre reprend l'esprit de l'interface de Dofus 3 : 
 ### Ambiances
 
 L'intensité (5 à 100 %) dose l'effet entre l'image d'origine et l'ambiance complète.
+
+<p align="center">
+  <img src="assets/readme/moods.jpg" alt="La même scène sans filtre puis avec chaque ambiance, à 80 % d'intensité">
+</p>
 
 | Ambiance | Luminosité | Saturation | Teinte |
 | --- | --- | --- | --- |
