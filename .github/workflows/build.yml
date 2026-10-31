@@ -65,9 +65,17 @@ jobs:
           } >> notes.md
           cat notes.md
 
-      - name: Publish the release
+      # Releases are immutable once published: create a draft with the exe, then publish it.
+      - name: Create the release (draft)
         uses: softprops/action-gh-release@v2
         with:
           name: Pénombre ${{ github.ref_name }}
           body_path: notes.md
           files: dist/Penombre.exe
+          draft: true
+
+      - name: Publish the release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release edit "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --draft=false --latest
