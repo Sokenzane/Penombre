@@ -537,6 +537,8 @@ namespace Penombre
             { "sIcon",      new[] { "Icon near the clock", "Icône près de l'horloge" } },
             { "ico0",       new[] { "Moon egg", "Œuf de lune" } },
             { "ico0d",      new[] { "Changes colour with the sky (default)", "Change de couleur avec le ciel (par défaut)" } },
+            { "iconHint",   new[] { "The icon follows the sky in automatic mode (night, dusk, day). Without it, it only shows whether the filter is on.",
+                                    "L'icône suit le ciel en mode automatique (nuit, crépuscule, jour). Sans lui, elle indique seulement si le filtre est actif." } },
             { "ico1",       new[] { "Watcher egg", "Œuf veilleur" } },
             { "ico1d",      new[] { "Awake at night, asleep by day", "Veille la nuit, dort le jour" } },
             { "ico2",       new[] { "Round moon", "Lune bombée" } },
@@ -2965,6 +2967,7 @@ namespace Penombre
                 iconChoices[i] = c;
                 Wide(t, c);
             }
+            Hint(t, T.S("iconHint"), 0);
             Section(t, T.S("sZones"));
             zonesBox = Check(T.S("zonesKeep")); Row(t, "", zonesBox);
             var zonesButton = new GameButton(T.S("zonesEdit"), GameButton.Kind.Normal);
