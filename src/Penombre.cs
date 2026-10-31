@@ -51,14 +51,14 @@ using Microsoft.Win32;
 [assembly: AssemblyDescription("A night mode for Dofus 3")]
 [assembly: AssemblyProduct("Pénombre")]
 [assembly: AssemblyCopyright("Copyright (C) 2026 Sokenzane - GPL-3.0")]
-[assembly: AssemblyVersion("0.5.0.0")]
-[assembly: AssemblyFileVersion("0.5.0.0")]
+[assembly: AssemblyVersion("0.5.1.0")]
+[assembly: AssemblyFileVersion("0.5.1.0")]
 
 namespace Penombre
 {
     static partial class Program
     {
-        public const string Version = "0.5.0";
+        public const string Version = "0.5.1";
         public static bool SelfTestMode;   // test build only (src/SelfTest.cs)
         public static string DataOverride; // --data=<folder>: settings and log elsewhere
         public static string InstanceName { get { return SelfTestMode ? "Sokenzane.Penombre.SelfTest" : "Sokenzane.Penombre"; } }
@@ -583,7 +583,7 @@ namespace Penombre
             { "import",     new[] { "Import…", "Importer…" } },
             { "importDone", new[] { "Settings imported.", "Réglages importés." } },
             { "importBad",  new[] { "This file does not look like Pénombre settings.", "Ce fichier ne ressemble pas à des réglages de Pénombre." } },
-            { "reset",      new[] { "Reset settings…", "Réinitialiser les réglages…" } },
+            { "resetAll",   new[] { "Reset settings…", "Réinitialiser les réglages…" } },
             { "resetHint",  new[] { "Puts everything back as on the first start. The log, the settings folder and start with Windows stay as they are.",
                                     "Remet tout comme au premier lancement. Le journal, le dossier des réglages et le lancement au démarrage restent tels quels." } },
             { "resetAsk",   new[] { "Put all settings back to default?\n\nMood, schedule, shortcuts, bright zones and per-account settings will be lost. Use Export… first to keep a copy.",
@@ -3062,7 +3062,7 @@ namespace Penombre
             var import = new GameButton(T.S("import"), GameButton.Kind.Normal);
             var log = new GameButton(T.S("openLog"), GameButton.Kind.Normal);
             Row(t, "", Flow(export, import, log));
-            var reset = new GameButton(T.S("reset"), GameButton.Kind.Normal);
+            var reset = new GameButton(T.S("resetAll"), GameButton.Kind.Normal);
             Row(t, "", reset);
             Hint(t, T.S("resetHint"), 1);
 

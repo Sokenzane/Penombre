@@ -2,11 +2,19 @@
 
 ## Sommaire
 
+- [0.5.1](#051)
 - [0.5.0](#050)
 - [0.4.0](#040)
 - [0.3.0](#030)
 - [0.2.0](#020)
 - [0.1.0](#010)
+
+## 0.5.1
+
+Contient toutes les nouveautés de la 0.5.0 (nouvelle fenêtre de réglages, icônes, aperçu en direct…), détaillées dans le [journal des modifications](https://github.com/Sokenzane/Penombre/blob/main/CHANGELOG.md#050).
+
+- Corrigé : la 0.5.0 se fermait dès le lancement (un texte de l'interface était déclaré deux fois). Elle est remplacée par celle-ci
+- La compilation sur GitHub vérifie désormais que chaque texte de l'interface n'est déclaré qu'une fois
 
 ## 0.5.0
 

@@ -16,6 +16,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # A text key written twice compiles fine but stops the app at start.
+      - name: Check that every interface text key is unique
+        shell: bash
+        run: |
+          dups=$(grep -oE '^ +\{ "[A-Za-z0-9]+", +new\[\]' src/Penombre.cs | grep -oE '"[A-Za-z0-9]+"' | sort | uniq -d)
+          if [ -n "$dups" ]; then echo "::error::Text keys used twice in T: $dups"; exit 1; fi
+
       - name: Compile with the .NET Framework C# compiler
         shell: cmd
         run: build.bat ci
