@@ -507,8 +507,8 @@ namespace Penombre
                                     "Obtener la versión {0}" } },
             { "updChecking",new[] { "Checking…", "Vérification…",
                                     "Buscando…" } },
-            { "updLatest",  new[] { "You have the latest version ({0}).", "Tu as la dernière version ({0}).",
-                                    "Tienes la última versión ({0})." } },
+            { "updLatest",  new[] { "You have the latest version.", "Tu as la dernière version.",
+                                    "Tienes la última versión." } },
             { "updNew",     new[] { "Version {0} is available.", "La version {0} est disponible.",
                                     "La versión {0} está disponible." } },
             { "updFail",    new[] { "Cannot reach GitHub right now.", "Impossible de joindre GitHub pour le moment.",
@@ -2880,7 +2880,15 @@ namespace Penombre
                 Dock = DockStyle.Left, Width = Theme.Px(66), BackColor = Theme.Rail, FlowDirection = FlowDirection.TopDown,
                 WrapContents = false, Padding = new Padding(0, Theme.Px(10), 0, 0),
             };
-            railPanel.Paint += (s, e) => { using (var pen = new Pen(Theme.Line)) e.Graphics.DrawLine(pen, railPanel.Width - 1, 0, railPanel.Width - 1, railPanel.Height); };
+            railPanel.Paint += (s, e) =>
+            {
+                using (var pen = new Pen(Theme.Line)) e.Graphics.DrawLine(pen, railPanel.Width - 1, 0, railPanel.Width - 1, railPanel.Height);
+                // the version, discreetly, at the bottom of the rail
+                using (Font f = Theme.Body(7.5f))
+                    TextRenderer.DrawText(e.Graphics, "v" + Program.Version, f, new Rectangle(0, railPanel.Height - Theme.Px(26), railPanel.Width - 1, Theme.Px(20)),
+                                          Color.FromArgb(0x6e, 0x6b, 0x7a), TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
+            };
+            railPanel.Resize += (s, e) => railPanel.Invalidate();
             footer = new FooterBar();
             var closeButton = new GameButton(T.S("close"), GameButton.Kind.Primary);
             closeButton.Click += (s, e) => Close();
@@ -3633,7 +3641,7 @@ namespace Penombre
             switch (Updates.Status)
             {
                 case Updates.State.Checking: updateLabel.Text = T.S("updChecking"); break;
-                case Updates.State.UpToDate: updateLabel.Text = string.Format(T.S("updLatest"), Program.Version); break;
+                case Updates.State.UpToDate: updateLabel.Text = T.S("updLatest"); break;
                 case Updates.State.Newer: updateLabel.Text = string.Format(T.S("updNew"), Updates.Latest); break;
                 case Updates.State.Failed: updateLabel.Text = T.S("updFail"); break;
                 default: updateLabel.Text = ""; break;
