@@ -1024,6 +1024,27 @@ namespace Penombre
             Check("import restores exported settings", Settings.LoadFrom(export) && Settings.Intensity == 70, "intensity=" + Settings.Intensity);
             Settings.Intensity = 80;
 
+            // Reset to defaults (then the test settings come back)
+            string kept = Path.Combine(dir, "before-reset.ini");
+            Settings.Intensity = 33; Settings.PresetIndex = 2; Settings.TrayIconAuto = false;
+            Settings.Profile("ResetTest", true).Own = true;
+            Settings.Zones = new List<Zone> { Zone.FromLocal(new Rectangle(1, 1, 50, 20), new Size(800, 600)) };
+            Settings.Hotkeys[Shortcuts.Toggle] = Keys.Control | Keys.Alt | Keys.F12;
+            Settings.SaveTo(kept);
+            Settings.ResetToDefaults();
+            Keys[] firstKeys = Shortcuts.Defaults();
+            bool sameKeys = true;
+            for (int i = 0; i < Shortcuts.Count; i++) if (Settings.Hotkeys[i] != firstKeys[i]) sameKeys = false;
+            Check("reset puts the settings of a first start back",
+                  Settings.Intensity == 80 && Settings.PresetIndex == 0 && Settings.TrayIconAuto && Settings.Accounts.Count == 0
+                  && Settings.Zones.Count == 0 && sameKeys && Settings.FadeMs == 600,
+                  "intensity=" + Settings.Intensity + " preset=" + Settings.PresetIndex + " accounts=" + Settings.Accounts.Count
+                  + " zones=" + Settings.Zones.Count + " keys=" + sameKeys + " fade=" + Settings.FadeMs);
+            Settings.LoadFrom(kept);
+            Settings.Accounts.Remove("ResetTest"); Settings.Zones = new List<Zone>(); Settings.Hotkeys = Shortcuts.Defaults();
+            Settings.Intensity = 80; Settings.PresetIndex = 0; Settings.TrayIconAuto = true;
+            app.NotifyChanged();
+
             // Portable mode
             string portable = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), Settings.PortableFolderName);
             if (Directory.Exists(portable)) Skip("portable mode", "a Penombre-data folder already exists next to the exe");

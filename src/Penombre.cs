@@ -583,6 +583,12 @@ namespace Penombre
             { "import",     new[] { "Import…", "Importer…" } },
             { "importDone", new[] { "Settings imported.", "Réglages importés." } },
             { "importBad",  new[] { "This file does not look like Pénombre settings.", "Ce fichier ne ressemble pas à des réglages de Pénombre." } },
+            { "reset",      new[] { "Reset settings…", "Réinitialiser les réglages…" } },
+            { "resetHint",  new[] { "Puts everything back as on the first start. The log, the settings folder and start with Windows stay as they are.",
+                                    "Remet tout comme au premier lancement. Le journal, le dossier des réglages et le lancement au démarrage restent tels quels." } },
+            { "resetAsk",   new[] { "Put all settings back to default?\n\nMood, schedule, shortcuts, bright zones and per-account settings will be lost. Use Export… first to keep a copy.",
+                                    "Remettre tous les réglages par défaut ?\n\nAmbiance, horaires, raccourcis, zones claires et réglages par compte seront perdus. Utilise d'abord Exporter… pour en garder une copie." } },
+            { "resetDone",  new[] { "Settings reset.", "Réglages réinitialisés." } },
             { "folder",     new[] { "Settings folder", "Dossier des réglages" } },
             { "openFolder", new[] { "Open", "Ouvrir" } },
             { "close",      new[] { "Close", "Fermer" } },
@@ -1065,6 +1071,7 @@ namespace Penombre
         static Timer saveTimer;
         static readonly CultureInfo Inv = CultureInfo.InvariantCulture;
         static string folder;
+        static string[] defaults; // the settings of a first start, taken before loading the file
 
         // ---- where the settings live
 
@@ -1083,6 +1090,7 @@ namespace Penombre
 
         public static void Init()
         {
+            if (defaults == null) defaults = Lines();
             folder = Program.DataOverride != null ? Program.DataOverride
                    : Directory.Exists(PortableFolder) ? PortableFolder : AppDataFolder;
         }
@@ -1146,70 +1154,81 @@ namespace Penombre
         {
             try
             {
-                if (!File.Exists(path)) return false;
-                string[] lines = File.ReadAllLines(path, Encoding.UTF8);
-                bool recognized = false;
-                foreach (string line in lines)
-                    if (line.StartsWith("enabled=") || line.StartsWith("preset=") || line.StartsWith("render=")) recognized = true;
-                if (!recognized) return false;
-
-                Accounts = new Dictionary<string, AccountProfile>();
-                Zones = new List<Zone>();
-                Hotkeys = Shortcuts.Defaults();
-                foreach (string line in lines)
-                {
-                    int eq = line.IndexOf('=');
-                    if (eq <= 0) continue;
-                    string k = line.Substring(0, eq).Trim(), v = line.Substring(eq + 1).Trim();
-                    int n;
-                    double d;
-                    if (k.StartsWith("account."))
-                    {
-                        ParseAccount(k.Substring(8), v);
-                        continue;
-                    }
-                    if (k.StartsWith("hotkey."))
-                    {
-                        int idx = Array.IndexOf(Shortcuts.SettingNames, k.Substring(7));
-                        if (idx >= 0 && int.TryParse(v, out n)) Hotkeys[idx] = (Keys)n;
-                        continue;
-                    }
-                    switch (k)
-                    {
-                        case "enabled": Enabled = v != "0"; break;
-                        case "render": Shader = v != "veil"; break;
-                        case "preset": if (int.TryParse(v, out n) && n >= 0 && n < Preset.Count) PresetIndex = n; break;
-                        case "intensity": if (int.TryParse(v, out n)) Intensity = ClampIntensity(n); break;
-                        case "vignette": if (int.TryParse(v, out n) && n >= 0 && n <= 3) Vignette = n; break;
-                        case "vignetteColor": VignetteColor = ParseColor(v, DefaultVignetteColor); break;
-                        case "grain": if (int.TryParse(v, out n) && n >= 0 && n <= 2) Grain = n; break;
-                        case "process": if (v.Length > 0) ProcessName = v; break;
-                        case "auto": Auto = v == "1"; break;
-                        case "sun": SunMode = v == "1"; break;
-                        case "sunCity": SunCity = v; break;
-                        case "sunLat": if (double.TryParse(v, NumberStyles.Float, Inv, out d) && d >= -90 && d <= 90) SunLat = d; break;
-                        case "sunLon": if (double.TryParse(v, NumberStyles.Float, Inv, out d) && d >= -180 && d <= 180) SunLon = d; break;
-                        case "dusk": ParseTime(v, ref Dusk); break;
-                        case "night": ParseTime(v, ref Night); break;
-                        case "dawn": ParseTime(v, ref Dawn); break;
-                        case "day": ParseTime(v, ref Day); break;
-                        case "fade": if (int.TryParse(v, out n)) FadeMs = Math.Max(0, Math.Min(3000, n)); break;
-                        case "custom": ParseCustom(v); break;
-                        case "zonesEnabled": ZonesEnabled = v == "1"; break;
-                        case "zonesAnchored": ZonesAnchored = v == "1"; break;
-                        case "zonesScale": ZonesScale = v == "1"; break;
-                        case "zones2":
-                            foreach (string z in v.Split(';')) { Zone zone = Zone.Parse(z); if (zone != null) Zones.Add(zone); }
-                            break;
-                        case "onlyForeground": OnlyForeground = v == "1"; break;
-                        case "trayIcon": if (int.TryParse(v, out n)) TrayIcon = Math.Max(0, Math.Min(2, n)); break;
-                        case "trayIconAuto": TrayIconAuto = v != "0"; break;
-                        case "trayIconColor": if (int.TryParse(v, out n)) TrayIconColor = Math.Max(0, Math.Min(2, n)); break;
-                    }
-                }
-                return true;
+                return File.Exists(path) && Parse(File.ReadAllLines(path, Encoding.UTF8));
             }
             catch (Exception ex) { Log.Error("Settings load from " + path, ex); return false; }
+        }
+
+        // Back to the settings of a first start (the folder, portable or not, stays the same).
+        public static void ResetToDefaults()
+        {
+            Parse(defaults);
+            Save();
+            Log.Info("Settings reset to defaults");
+        }
+
+        static bool Parse(string[] lines)
+        {
+            bool recognized = false;
+            foreach (string line in lines)
+                if (line.StartsWith("enabled=") || line.StartsWith("preset=") || line.StartsWith("render=")) recognized = true;
+            if (!recognized) return false;
+
+            Accounts = new Dictionary<string, AccountProfile>();
+            Zones = new List<Zone>();
+            Hotkeys = Shortcuts.Defaults();
+            foreach (string line in lines)
+            {
+                int eq = line.IndexOf('=');
+                if (eq <= 0) continue;
+                string k = line.Substring(0, eq).Trim(), v = line.Substring(eq + 1).Trim();
+                int n;
+                double d;
+                if (k.StartsWith("account."))
+                {
+                    ParseAccount(k.Substring(8), v);
+                    continue;
+                }
+                if (k.StartsWith("hotkey."))
+                {
+                    int idx = Array.IndexOf(Shortcuts.SettingNames, k.Substring(7));
+                    if (idx >= 0 && int.TryParse(v, out n)) Hotkeys[idx] = (Keys)n;
+                    continue;
+                }
+                switch (k)
+                {
+                    case "enabled": Enabled = v != "0"; break;
+                    case "render": Shader = v != "veil"; break;
+                    case "preset": if (int.TryParse(v, out n) && n >= 0 && n < Preset.Count) PresetIndex = n; break;
+                    case "intensity": if (int.TryParse(v, out n)) Intensity = ClampIntensity(n); break;
+                    case "vignette": if (int.TryParse(v, out n) && n >= 0 && n <= 3) Vignette = n; break;
+                    case "vignetteColor": VignetteColor = ParseColor(v, DefaultVignetteColor); break;
+                    case "grain": if (int.TryParse(v, out n) && n >= 0 && n <= 2) Grain = n; break;
+                    case "process": if (v.Length > 0) ProcessName = v; break;
+                    case "auto": Auto = v == "1"; break;
+                    case "sun": SunMode = v == "1"; break;
+                    case "sunCity": SunCity = v; break;
+                    case "sunLat": if (double.TryParse(v, NumberStyles.Float, Inv, out d) && d >= -90 && d <= 90) SunLat = d; break;
+                    case "sunLon": if (double.TryParse(v, NumberStyles.Float, Inv, out d) && d >= -180 && d <= 180) SunLon = d; break;
+                    case "dusk": ParseTime(v, ref Dusk); break;
+                    case "night": ParseTime(v, ref Night); break;
+                    case "dawn": ParseTime(v, ref Dawn); break;
+                    case "day": ParseTime(v, ref Day); break;
+                    case "fade": if (int.TryParse(v, out n)) FadeMs = Math.Max(0, Math.Min(3000, n)); break;
+                    case "custom": ParseCustom(v); break;
+                    case "zonesEnabled": ZonesEnabled = v == "1"; break;
+                    case "zonesAnchored": ZonesAnchored = v == "1"; break;
+                    case "zonesScale": ZonesScale = v == "1"; break;
+                    case "zones2":
+                        foreach (string z in v.Split(';')) { Zone zone = Zone.Parse(z); if (zone != null) Zones.Add(zone); }
+                        break;
+                    case "onlyForeground": OnlyForeground = v == "1"; break;
+                    case "trayIcon": if (int.TryParse(v, out n)) TrayIcon = Math.Max(0, Math.Min(2, n)); break;
+                    case "trayIconAuto": TrayIconAuto = v != "0"; break;
+                    case "trayIconColor": if (int.TryParse(v, out n)) TrayIconColor = Math.Max(0, Math.Min(2, n)); break;
+                }
+            }
+            return true;
         }
 
         // Saves a moment later, so dragging a slider does not write the file 50 times.
@@ -1236,6 +1255,11 @@ namespace Penombre
         }
 
         public static void SaveTo(string path)
+        {
+            File.WriteAllLines(path, Lines(), new UTF8Encoding(false));
+        }
+
+        static string[] Lines()
         {
             var zones = new List<string>();
             foreach (Zone z in Zones) zones.Add(z.Serialize());
@@ -1277,7 +1301,7 @@ namespace Penombre
                 lines.Add("account." + kv.Key.Replace("=", "") + "=" + (p.Filter ? 1 : 0) + "," + (p.Own ? 1 : 0) + ","
                           + p.Preset + "," + p.Intensity + "," + p.Vignette);
             }
-            File.WriteAllLines(path, lines.ToArray(), new UTF8Encoding(false));
+            return lines.ToArray();
         }
 
         public static int ClampIntensity(int v) { return Math.Max(MinIntensity, Math.Min(MaxIntensity, v)); }
@@ -3038,6 +3062,9 @@ namespace Penombre
             var import = new GameButton(T.S("import"), GameButton.Kind.Normal);
             var log = new GameButton(T.S("openLog"), GameButton.Kind.Normal);
             Row(t, "", Flow(export, import, log));
+            var reset = new GameButton(T.S("reset"), GameButton.Kind.Normal);
+            Row(t, "", reset);
+            Hint(t, T.S("resetHint"), 1);
 
             startupBox.CheckedChanged += (s, e) => { if (!loading) Startup.Set(startupBox.Checked); };
             portableBox.CheckedChanged += (s, e) =>
@@ -3082,6 +3109,16 @@ namespace Penombre
                 }
             };
             log.Click += (s, e) => TrayApp.OpenLog();
+            reset.Click += (s, e) =>
+            {
+                if (MessageBox.Show(this, T.S("resetAsk"), "Pénombre", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) != DialogResult.Yes)
+                    return;
+                Settings.ResetToDefaults();
+                manager.Rebuild();
+                Commit();
+                LoadAll();
+                MessageBox.Show(this, T.S("resetDone"), "Pénombre", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            };
         }
 
         // ---- building blocks

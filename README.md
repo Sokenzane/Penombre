@@ -17,6 +17,7 @@
 
 <p align="center">
   <a href="https://github.com/Sokenzane/Penombre/releases/latest/download/Penombre.exe"><b>Télécharger Penombre.exe</b></a>
+  &nbsp;·&nbsp; <a href="https://github.com/Sokenzane/Penombre/releases/latest/download/Penombre-portable.zip">version portable (.zip)</a>
 </p>
 
 <p align="center">
@@ -68,7 +69,7 @@ Ankama n'a ni examiné ni approuvé Pénombre. Lis toi-même les conditions d'ut
 
 ## Téléchargement
 
-**[Télécharge Penombre.exe](https://github.com/Sokenzane/Penombre/releases/latest/download/Penombre.exe)** et lance-le. Pas d'installation, pas de droits administrateur. Les notes de version et les versions précédentes sont sur la page [Releases](https://github.com/Sokenzane/Penombre/releases), avec le SHA-256 de chaque exe (voir [SECURITY.md](SECURITY.md#vérifier-un-téléchargement)). Il faut .NET Framework 4, fourni avec tous les Windows 10 et 11.
+**[Télécharge Penombre.exe](https://github.com/Sokenzane/Penombre/releases/latest/download/Penombre.exe)** et lance-le. Pas d'installation, pas de droits administrateur. Pour une clé USB ou plusieurs PC, prends plutôt **[la version portable](https://github.com/Sokenzane/Penombre/releases/latest/download/Penombre-portable.zip)** : le même exe dans un dossier, avec ses réglages rangés à côté de lui (voir [mode portable](#mode-portable-et-sauvegarde)). Les notes de version et les versions précédentes sont sur la page [Releases](https://github.com/Sokenzane/Penombre/releases), avec le SHA-256 de chaque exe (voir [SECURITY.md](SECURITY.md#vérifier-un-téléchargement)). Il faut .NET Framework 4, fourni avec tous les Windows 10 et 11.
 
 > L'exe n'est pas signé : Windows SmartScreen peut afficher *« Windows a protégé votre ordinateur »*. Clique sur **Informations complémentaires**, puis **Exécuter quand même**. Tu peux aussi [le compiler toi-même](#compiler-soi-même) en un clic.
 
@@ -107,7 +108,7 @@ Menu **Réglages…**. La fenêtre reprend l'esprit de l'interface de Dofus 3 : 
 | Comptes | réglages par compte |
 | Affichage | icône de la zone de notification, zones claires, « seulement quand Dofus est au premier plan » |
 | Raccourcis | tous les raccourcis, personnalisables |
-| Général | lancement au démarrage, mode portable, dossier des réglages, export / import, journal |
+| Général | lancement au démarrage, mode portable, dossier des réglages, export / import, réinitialisation, journal |
 
 ### Ambiances
 
@@ -164,8 +165,9 @@ Trois styles au choix dans **Réglages… > Affichage**. Avec la case **Adapter 
 
 ### Mode portable et sauvegarde
 
-- **Mode portable** (onglet Général) : réglages et journal passent dans un dossier `Penombre-data` à côté de l'exe. Copie le dossier avec l'exe sur un autre PC, tout suit, zones comprises. Décoche pour les remettre dans `%APPDATA%`.
+- **Mode portable** (onglet Général) : réglages et journal passent dans un dossier `Penombre-data` à côté de l'exe. Si ce dossier existe au lancement, Pénombre l'utilise d'office : c'est ce que fait la version portable. Copie le dossier avec l'exe sur un autre PC, tout suit, zones comprises. Décoche pour les remettre dans `%APPDATA%`.
 - **Exporter… / Importer…** : enregistre tes réglages dans un fichier, ou charge un fichier enregistré sur un autre PC.
+- **Réinitialiser les réglages…** : remet tout comme au premier lancement (après confirmation). Le journal, le dossier des réglages et le lancement au démarrage restent tels quels.
 
 ## Fonctionnement
 
@@ -193,7 +195,7 @@ Les fenêtres traversées par les clics (overlays GPU, Discord, Steam…), invis
 
 Dans `%APPDATA%\Penombre\` (ou `Penombre-data` à côté de l'exe en [mode portable](#mode-portable-et-sauvegarde)) :
 
-- `settings.ini` : tous les réglages, y compris ceux par compte et les raccourcis. Si ton client ne s'appelle pas `Dofus.exe`, modifie la ligne `process=`. Supprime le fichier pour tout remettre à zéro.
+- `settings.ini` : tous les réglages, y compris ceux par compte et les raccourcis. Si ton client ne s'appelle pas `Dofus.exe`, modifie la ligne `process=`. Pour tout remettre à zéro : **Réinitialiser les réglages…** (onglet Général), ou supprime le fichier.
 - `penombre.log` : le journal (démarrage, fenêtres détectées, erreurs). Au-delà de 512 Ko, il est renommé en `penombre.log.old`.
 
 L'interface suit la langue de Windows (français ou anglais) ; `--lang=fr` ou `--lang=en` force la langue. Le lancement au démarrage écrit une seule valeur sous `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` ; rien d'autre n'est écrit sur ton système.
