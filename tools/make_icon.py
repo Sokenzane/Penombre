@@ -9,7 +9,8 @@ Writes, in assets/:
   logo.png         the 256 px logo used by the README
   tray-icons.png   the notification area icons: 3 styles x 4 states, at 16, 20, 24, 32, 40 and 48 px
 
-Small sizes use simplified drawings (thicker outlines, no sparkles) so they stay readable.
+The eggs keep their glass details at every size, with a thicker outline under 32 px;
+the round moon is simplified under 40 px.
 The PNG files are written by Pillow without any metadata.
 """
 from io import BytesIO
@@ -37,8 +38,9 @@ TRAY_SIZES = [16, 20, 24, 32, 40, 48]
 ICO_SIZES = [16, 20, 24, 32, 40, 48, 64, 128, 256]
 
 
-def egg(state: str, motif: str, detailed: bool, glow: bool) -> str:
+def egg(state: str, motif: str, glow: bool, size: int = 120) -> str:
     s = STATES[state]
+    rim = max(4.0, 150.0 / size)  # about 1.2 px, so the outline stays visible on small icons
     parts = [
         "<defs>",
         f'<radialGradient id="b" cx="42%" cy="38%" r="68%"><stop offset="0" stop-color="{s["c3"]}"/>'
@@ -50,46 +52,32 @@ def egg(state: str, motif: str, detailed: bool, glow: bool) -> str:
     ]
     if glow and s["glow_op"] > 0:
         parts.append(f'<circle cx="60" cy="62" r="60" fill="url(#g)" opacity="{min(1, s["glow_op"] * 2)}"/>')
-    if detailed:
-        parts.append(f'<path d="{EGG}" fill="url(#b)"/>')
-        parts.append('<g clip-path="url(#c)">')
-        parts.append(f'<circle cx="60" cy="70" r="30" fill="{s["core"]}" opacity="0.55"/>')
-        if motif == "moon":
-            parts.append(f'<path d="M40 92q-10-20 6-34" fill="none" stroke="{s["m1"]}" stroke-width="10" stroke-linecap="round" opacity="0.35"/>')
-            parts.append(f'<path d="M40 92q-10-20 6-34" fill="none" stroke="{s["m1"]}" stroke-width="4" stroke-linecap="round"/>')
-            parts.append(f'<path d="M68 48a20 20 0 1 0 12 30a15 15 0 1 1-12-30z" fill="{s["m1"]}" stroke="{s["m2"]}" stroke-width="2.5"/>')
-        elif motif == "sun":
-            parts.append(f'<circle cx="62" cy="70" r="12" fill="{s["m1"]}" stroke="{s["m2"]}" stroke-width="2.5"/>')
-            parts.append(f'<path d="M62 50q20 4 18 24M42 80q-6-16 8-26" fill="none" stroke="{s["m1"]}" stroke-width="4" stroke-linecap="round"/>')
-        elif motif == "eyes_open":
-            parts.append('<ellipse cx="47" cy="72" rx="7" ry="10" fill="#120c06"/><ellipse cx="73" cy="72" rx="7" ry="10" fill="#120c06"/>'
-                         '<circle cx="49" cy="68" r="3" fill="#ffffff"/><circle cx="75" cy="68" r="3" fill="#ffffff"/>')
-        elif motif == "eyes_closed":
-            parts.append('<path d="M40 74q7 6 14 0M66 74q7 6 14 0" fill="none" stroke="#120c06" stroke-width="4" stroke-linecap="round"/>')
-        if s["spark"]:
-            parts.append('<g fill="#ffffff"><circle cx="34" cy="62" r="2"/><circle cx="82" cy="40" r="1.8"/>'
-                         '<circle cx="86" cy="88" r="2.2"/><circle cx="50" cy="100" r="1.6"/><circle cx="74" cy="26" r="1.4"/></g>')
-        if state == "off" and motif == "moon":
-            parts.append('<path d="M50 18l6 18-8 10 12 14-4 16" fill="none" stroke="#2b2b2b" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>')
-        parts.append('<path d="M92 84q-6 20-28 26q18-10 24-28z" fill="#ffffff" opacity="0.35"/>')
-        parts.append("</g>")
-        parts.append(f'<path d="{EGG}" fill="none" stroke="{s["rim"]}" stroke-width="4"/>')
-        parts.append(f'<path d="{EGG_IN}" fill="none" stroke="{s["rim2"]}" stroke-width="3" opacity="0.8"/>')
-        parts.append('<path d="M32 46q6-26 26-32q-16 12-20 34z" fill="#ffffff" opacity="0.85"/>')
-        parts.append('<circle cx="40" cy="58" r="3.5" fill="#ffffff" opacity="0.85"/>')
-    else:
-        parts.append(f'<path d="{EGG}" fill="url(#b)" stroke="{s["rim"]}" stroke-width="10"/>')
-        if motif == "moon":
-            parts.append(f'<path d="M66 46a24 24 0 1 0 14 36a18 18 0 1 1-14-36z" fill="{s["m1"]}" stroke="{s["m2"]}" stroke-width="5"/>')
-        elif motif == "sun":
-            parts.append(f'<circle cx="60" cy="70" r="16" fill="{s["m1"]}" stroke="{s["m2"]}" stroke-width="5"/>')
-        elif motif == "eyes_open":
-            parts.append('<ellipse cx="45" cy="72" rx="9" ry="13" fill="#120c06"/><ellipse cx="75" cy="72" rx="9" ry="13" fill="#120c06"/>')
-        elif motif == "eyes_closed":
-            parts.append('<path d="M36 74q9 9 18 0M66 74q9 9 18 0" fill="none" stroke="#120c06" stroke-width="7" stroke-linecap="round"/>')
-        if state == "off" and motif == "moon":
-            parts.append('<path d="M50 18l8 18-8 12 12 16-6 16" fill="none" stroke="#2b2b2b" stroke-width="6" stroke-linejoin="round"/>')
-        parts.append('<path d="M32 48q6-28 28-34q-18 12-22 36z" fill="#ffffff" opacity="0.85"/>')
+    parts.append(f'<path d="{EGG}" fill="url(#b)"/>')
+    parts.append('<g clip-path="url(#c)">')
+    parts.append(f'<circle cx="60" cy="70" r="30" fill="{s["core"]}" opacity="0.55"/>')
+    if motif == "moon":
+        parts.append(f'<path d="M40 92q-10-20 6-34" fill="none" stroke="{s["m1"]}" stroke-width="10" stroke-linecap="round" opacity="0.35"/>')
+        parts.append(f'<path d="M40 92q-10-20 6-34" fill="none" stroke="{s["m1"]}" stroke-width="4" stroke-linecap="round"/>')
+        parts.append(f'<path d="M68 48a20 20 0 1 0 12 30a15 15 0 1 1-12-30z" fill="{s["m1"]}" stroke="{s["m2"]}" stroke-width="2.5"/>')
+    elif motif == "sun":
+        parts.append(f'<circle cx="62" cy="70" r="12" fill="{s["m1"]}" stroke="{s["m2"]}" stroke-width="2.5"/>')
+        parts.append(f'<path d="M62 50q20 4 18 24M42 80q-6-16 8-26" fill="none" stroke="{s["m1"]}" stroke-width="4" stroke-linecap="round"/>')
+    elif motif == "eyes_open":
+        parts.append('<ellipse cx="47" cy="72" rx="7" ry="10" fill="#120c06"/><ellipse cx="73" cy="72" rx="7" ry="10" fill="#120c06"/>'
+                     '<circle cx="49" cy="68" r="3" fill="#ffffff"/><circle cx="75" cy="68" r="3" fill="#ffffff"/>')
+    elif motif == "eyes_closed":
+        parts.append('<path d="M40 74q7 6 14 0M66 74q7 6 14 0" fill="none" stroke="#120c06" stroke-width="4" stroke-linecap="round"/>')
+    if s["spark"]:
+        parts.append('<g fill="#ffffff"><circle cx="34" cy="62" r="2"/><circle cx="82" cy="40" r="1.8"/>'
+                     '<circle cx="86" cy="88" r="2.2"/><circle cx="50" cy="100" r="1.6"/><circle cx="74" cy="26" r="1.4"/></g>')
+    if state == "off" and motif == "moon":
+        parts.append('<path d="M50 18l6 18-8 10 12 14-4 16" fill="none" stroke="#2b2b2b" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>')
+    parts.append('<path d="M92 84q-6 20-28 26q18-10 24-28z" fill="#ffffff" opacity="0.35"/>')
+    parts.append("</g>")
+    parts.append(f'<path d="{EGG}" fill="none" stroke="{s["rim"]}" stroke-width="{rim:.1f}"/>')
+    parts.append(f'<path d="{EGG_IN}" fill="none" stroke="{s["rim2"]}" stroke-width="3" opacity="0.8"/>')
+    parts.append('<path d="M32 46q6-26 26-32q-16 12-20 34z" fill="#ffffff" opacity="0.85"/>')
+    parts.append('<circle cx="40" cy="58" r="3.5" fill="#ffffff" opacity="0.85"/>')
     return "".join(parts)
 
 
@@ -108,14 +96,13 @@ def moon(state: str, detailed: bool) -> str:
 
 
 def drawing(style: str, state: str, size: int, glow: bool = True) -> str:
-    detailed = size >= 40
     if style == "moon":
-        return moon(state, detailed)
+        return moon(state, size >= 40)
     if style == "moon_egg":
         motif = "sun" if state == "day" else "moon"
     else:
         motif = "eyes_open" if state in ("night", "twilight") else "eyes_closed"
-    return egg(state, motif, detailed, glow)
+    return egg(state, motif, glow, size)
 
 
 def render(page, body: str, size: int) -> Image.Image:
