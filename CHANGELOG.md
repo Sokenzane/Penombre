@@ -2,12 +2,17 @@
 
 ## Sommaire
 
+- [Non publié](#non-publié)
 - [0.5.1](#051)
 - [0.5.0](#050)
 - [0.4.0](#040)
 - [0.3.0](#030)
 - [0.2.0](#020)
 - [0.1.0](#010)
+
+## Non publié
+
+- L'icône adaptative suit l'heure même quand le mode automatique est coupé (elle restait sur « nuit »)
 
 ## 0.5.1
 

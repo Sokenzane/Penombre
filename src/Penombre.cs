@@ -537,9 +537,9 @@ namespace Penombre
             { "sIcon",      new[] { "Icon near the clock", "Icône près de l'horloge" } },
             { "ico0",       new[] { "Moon egg", "Œuf de lune" } },
             { "ico0d",      new[] { "Changes colour with the sky (default)", "Change de couleur avec le ciel (par défaut)" } },
-            { "iconAuto",   new[] { "Match the icon to the time of day (automatic mode)", "Adapter l'icône à l'heure (mode automatique)" } },
-            { "iconHint",   new[] { "Ticked: the icon follows the sky of the automatic mode (night, dusk, day). Unticked: click the picture you want to keep. The grey picture always means the filter is off.",
-                                    "Coché : l'icône suit le ciel du mode automatique (nuit, crépuscule, jour). Décoché : clique sur l'image de ton choix pour la garder. L'image grise indique toujours un filtre coupé." } },
+            { "iconAuto",   new[] { "Match the icon to the time of day", "Adapter l'icône à l'heure" } },
+            { "iconHint",   new[] { "Ticked: the icon follows the sky of the times set in Schedule (night, dusk, day), even if the filter does not. Unticked: click the picture you want to keep. The grey picture always means the filter is off.",
+                                    "Coché : l'icône suit le ciel selon les horaires de la rubrique Horaires (nuit, crépuscule, jour), même si le filtre ne les suit pas. Décoché : clique sur l'image de ton choix pour la garder. L'image grise indique toujours un filtre coupé." } },
             { "ico1",       new[] { "Watcher egg", "Œuf veilleur" } },
             { "ico1d",      new[] { "Awake at night, asleep by day", "Veille la nuit, dort le jour" } },
             { "ico2",       new[] { "Round moon", "Lune bombée" } },
@@ -3649,7 +3649,10 @@ namespace Penombre
 
             TrayState now = !Settings.Enabled ? TrayState.Off : f <= 0 ? TrayState.Day : f >= 1 ? TrayState.Night : TrayState.Twilight;
             currentState = now;
-            int picture = Settings.Enabled && !Settings.TrayIconAuto ? Settings.TrayIconColor : StateOf(now);
+            // The icon shows the sky of the schedule (Horaires), even when the filter does not follow it.
+            float sky = DayCycle.Factor(DateTime.Now);
+            TrayState skyState = sky <= 0 ? TrayState.Day : sky >= 1 ? TrayState.Night : TrayState.Twilight;
+            int picture = !Settings.Enabled ? TrayIcons.Off : !Settings.TrayIconAuto ? Settings.TrayIconColor : StateOf(skyState);
             int key = Settings.TrayIcon * TrayIcons.StateCount + picture;
             if (key != currentIconKey)
             {
