@@ -41,7 +41,7 @@ body:
     id: diagnostics
     attributes:
       label: Diagnostic
-      description: Menu de la zone de notification > Copier le diagnostic, puis colle-le ici. Il contient les titres de tes fenêtres (noms de personnages) : remplace-les par XXX si tu préfères.
+      description: "Menu de la zone de notification > Copier le diagnostic, puis colle-le ici. Il contient les titres de tes fenêtres (noms de personnages) : remplace-les par XXX si tu préfères."
       render: text
   - type: textarea
     id: log

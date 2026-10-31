@@ -144,7 +144,7 @@ Le filtre suit l'heure de ton PC, avec deux façons de régler les horaires :
 
 ### Zones claires
 
-Pour garder lisibles la barre de sorts, le chat ou la timeline : **Réglages… > Définir les zones…**. Un calque s'affiche sur la fenêtre Dofus : glisse pour dessiner une zone, clic droit sur une zone pour la supprimer, `Suppr` pour tout effacer, `Entrée` pour valider, `Échap` pour annuler. Les zones valent pour tous les comptes. Par défaut, elles sont **ancrées au bord le plus proche** (une barre de sorts en bas reste en bas) et **grandissent avec la hauteur de la fenêtre**, comme l'interface de Dofus ; décoche ces deux options dans **Affichage** pour des zones proportionnelles à la fenêtre.
+Pour garder lisibles la barre de sorts, le chat ou la timeline : **Réglages… > Affichage > Définir les zones…**. Un calque s'affiche sur la fenêtre Dofus : glisse pour dessiner une zone, clic droit sur une zone pour la supprimer, `Suppr` pour tout effacer, `Entrée` pour valider, `Échap` pour annuler. Les zones valent pour tous les comptes. Par défaut, elles sont **ancrées au bord le plus proche** (une barre de sorts en bas reste en bas) et **grandissent avec la hauteur de la fenêtre**, comme l'interface de Dofus ; décoche ces deux options dans **Affichage** pour des zones proportionnelles à la fenêtre.
 
 ### Plusieurs comptes
 
@@ -181,12 +181,12 @@ Les fenêtres Dofus 3 sont détectées automatiquement (classe de fenêtre `Unit
 
 Chaque filtre est découpé (`SetWindowRgn`) à la partie **réellement visible** de sa fenêtre Dofus. Pénombre parcourt les fenêtres du haut vers le bas de la pile Windows : tout ce qui est au-dessus d'une fenêtre Dofus (autre appli, autre client) en masque la partie couverte. Deux filtres ne se superposent jamais, et l'assombrissement ne s'accumule pas quand tu passes d'un compte à l'autre.
 
-Les fenêtres traversées par les clics (overlays GPU, Discord, Steam…), invisibles ou masquées (autres bureaux virtuels) ne comptent pas comme des obstacles.
+Les fenêtres traversées par les clics (overlays GPU, Discord, Steam…), invisibles, masquées (autres bureaux virtuels) ou très fines (poignées d'onglets des outils qui regroupent les fenêtres) ne comptent pas comme des obstacles.
 
 ### Performances
 
 - Pénombre réagit aux événements Windows (fenêtre déplacée, affichée, masquée, mise au premier plan…) au lieu de tout revérifier en boucle. Une vérification de secours a lieu toutes les 500 ms.
-- Shader : 60 images/s pour le Dofus au premier plan, environ 20 pour ceux en arrière-plan.
+- Shader : environ 30 images/s pour le Dofus au premier plan (le rythme de l'API Magnification de Windows), environ 7 pour ceux en arrière-plan.
 - Le shader est suspendu quand Dofus est réduit ou entièrement caché, quand le filtre est coupé, ou en plein jour (mode auto). Le programme passe alors au ralenti (10 vérifications par seconde).
 
 ## Fichiers
