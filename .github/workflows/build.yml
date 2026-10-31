@@ -42,24 +42,6 @@ jobs:
           name: Penombre
           path: dist
 
-      # Portable version: the exe with an empty Penombre-data folder next to it, so the
-      # settings stay in that folder from the first start.
-      - name: Make the portable zip
-        shell: bash
-        run: |
-          mkdir -p pkg/Penombre/Penombre-data
-          cp dist/Penombre.exe pkg/Penombre/
-          printf '%s\r\n' \
-            "Pénombre - version portable" \
-            "" \
-            "Lance Penombre.exe. Comme le dossier Penombre-data est à côté de l'exe," \
-            "les réglages et le journal y sont rangés au lieu de %APPDATA%\\Penombre." \
-            "Copie le dossier Penombre entier (sur une clé USB, un autre PC...) : tout suit." \
-            "" \
-            "https://github.com/${GITHUB_REPOSITORY}" > pkg/Penombre/LISEZ-MOI.txt
-          (cd pkg && zip -r -X ../dist/Penombre-portable.zip Penombre)
-          unzip -l dist/Penombre-portable.zip
-
       - name: Prepare the release notes
         shell: bash
         run: |
@@ -77,8 +59,7 @@ jobs:
             echo
             echo "### Téléchargement"
             echo
-            echo "- [**Penombre.exe**](https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/Penombre.exe) — Windows 10/11 64 bits, rien à installer."
-            echo "- [**Penombre-portable.zip**](https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/Penombre-portable.zip) — le même exe, avec ses réglages rangés dans un dossier à côté de lui (clé USB, plusieurs PC)."
+            echo "[**Penombre.exe**](https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/Penombre.exe) — Windows 10/11 64 bits, rien à installer. Pour l'emporter sur une clé USB, coche le mode portable dans Réglages > Général."
             echo
             echo "SHA-256 : \`$(sha256sum dist/Penombre.exe | cut -d' ' -f1)\`"
           } >> notes.md
@@ -90,9 +71,7 @@ jobs:
         with:
           name: Pénombre ${{ github.ref_name }}
           body_path: notes.md
-          files: |
-            dist/Penombre.exe
-            dist/Penombre-portable.zip
+          files: dist/Penombre.exe
           draft: true
 
       - name: Publish the release

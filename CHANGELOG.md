@@ -19,7 +19,6 @@
 - Les heures se saisissent dans un champ horaire sombre ; le menu de la zone de notification reprend les mêmes couleurs
 - Relancer Pénombre alors qu'il tourne déjà ouvre sa fenêtre de réglages
 - Nouveau bouton **Réinitialiser les réglages…** (onglet Général), avec confirmation
-- Nouvelle **version portable** à télécharger : l'exe dans un dossier, avec un dossier `Penombre-data` qui garde ses réglages à côté de lui
 - Rubrique Comptes : changer l'ambiance, l'intensité ou le vignettage d'un personnage active aussitôt ses réglages propres (les contrôles restaient grisés tant que la case n'était pas cochée)
 - Corrigé : une fenêtre très fine au-dessus de Dofus (la poignée d'onglet d'un outil qui regroupe les fenêtres, par exemple) coupait une bande dans le filtre
 - Le self-test vérifie les nouvelles pages, les polices et les 36 images d'icônes, et que deux comptes aux mêmes réglages reçoivent la même teinte
