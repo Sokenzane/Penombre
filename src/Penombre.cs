@@ -41,9 +41,11 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
+using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Microsoft.Win32;
 
@@ -456,6 +458,15 @@ namespace Penombre
             { "settings",   new[] { "Settings…", "Réglages…" } },
             { "settingsT",  new[] { "Settings", "Réglages" } },
             { "diag",       new[] { "Copy diagnostics", "Copier le diagnostic" } },
+            { "updCheck",   new[] { "Check for updates (once a day, on GitHub)", "Vérifier les mises à jour (une fois par jour, sur GitHub)" } },
+            { "updNow",     new[] { "Check now", "Vérifier maintenant" } },
+            { "updSee",     new[] { "Get version {0}", "Obtenir la version {0}" } },
+            { "updChecking",new[] { "Checking…", "Vérification…" } },
+            { "updLatest",  new[] { "You have the latest version ({0}).", "Tu as la dernière version ({0})." } },
+            { "updNew",     new[] { "Version {0} is available.", "La version {0} est disponible." } },
+            { "updFail",    new[] { "Cannot reach GitHub right now.", "Impossible de joindre GitHub pour le moment." } },
+            { "updMenu",    new[] { "New version {0} available…", "Nouvelle version {0} disponible…" } },
+            { "updBalloon", new[] { "Pénombre {0} is available. Click to open its page.", "Pénombre {0} est disponible. Clique pour ouvrir sa page." } },
             { "diagDone",   new[] { "Diagnostics copied to the clipboard.", "Diagnostic copié dans le presse-papiers." } },
             { "openLog",    new[] { "Open the log", "Ouvrir le journal" } },
             { "noLog",      new[] { "The log is empty for now.", "Le journal est vide pour l'instant." } },
@@ -1062,6 +1073,7 @@ namespace Penombre
         public static int TrayIcon = 0;             // 0 moon egg, 1 watcher egg, 2 round moon
         public static bool TrayIconAuto = true;     // the icon follows the sky of the automatic mode
         public static int TrayIconColor = 0;        // otherwise, the picture kept while the filter is on (TrayIcons.Night / Twilight / Day)
+        public static bool CheckUpdates = true;     // asks GitHub once a day whether a newer version exists
 
         public static Dictionary<string, AccountProfile> Accounts = new Dictionary<string, AccountProfile>();
         public static Keys[] Hotkeys = Shortcuts.Defaults();
@@ -1226,6 +1238,7 @@ namespace Penombre
                     case "trayIcon": if (int.TryParse(v, out n)) TrayIcon = Math.Max(0, Math.Min(2, n)); break;
                     case "trayIconAuto": TrayIconAuto = v != "0"; break;
                     case "trayIconColor": if (int.TryParse(v, out n)) TrayIconColor = Math.Max(0, Math.Min(2, n)); break;
+                    case "checkUpdates": CheckUpdates = v != "0"; break;
                 }
             }
             return true;
@@ -1293,6 +1306,7 @@ namespace Penombre
                 "trayIcon=" + TrayIcon,
                 "trayIconAuto=" + (TrayIconAuto ? "1" : "0"),
                 "trayIconColor=" + TrayIconColor,
+                "checkUpdates=" + (CheckUpdates ? "1" : "0"),
             };
             for (int i = 0; i < Shortcuts.Count; i++) lines.Add("hotkey." + Shortcuts.SettingNames[i] + "=" + (int)Hotkeys[i]);
             foreach (var kv in Accounts)
@@ -1355,6 +1369,73 @@ namespace Penombre
             }
         }
 
+    }
+
+    // ================================================================ Updates
+
+    // Asks GitHub for the latest release (the only time Pénombre goes online). Nothing is
+    // downloaded: a newer version is only announced, with a link to its page.
+    static class Updates
+    {
+        const string Api = "https://api.github.com/repos/Sokenzane/Penombre/releases/latest";
+        public const string Page = "https://github.com/Sokenzane/Penombre/releases/latest";
+        public enum State { None, Checking, UpToDate, Newer, Failed }
+
+        public static State Status = State.None;
+        public static string Latest;          // version of the latest release, once known
+        public static event Action Changed;   // raised on the UI thread
+
+        public static void Check()
+        {
+            if (Status == State.Checking) return;
+            Status = State.Checking;
+            Raise();
+            var ui = System.Threading.SynchronizationContext.Current;
+            System.Threading.ThreadPool.QueueUserWorkItem(_ =>
+            {
+                string tag = null;
+                try
+                {
+                    ServicePointManager.SecurityProtocol |= (SecurityProtocolType)3072; // TLS 1.2
+                    var req = (HttpWebRequest)WebRequest.Create(Api);
+                    req.UserAgent = "Penombre/" + Program.Version;
+                    req.Accept = "application/vnd.github+json";
+                    req.Timeout = req.ReadWriteTimeout = 10000;
+                    using (WebResponse resp = req.GetResponse())
+                    using (var reader = new StreamReader(resp.GetResponseStream(), Encoding.UTF8))
+                        tag = ParseTag(reader.ReadToEnd());
+                }
+                catch (Exception ex) { Log.Info("Update check failed: " + ex.Message); }
+                ui.Post(__ =>
+                {
+                    Latest = tag;
+                    Status = tag == null ? State.Failed : IsNewer(tag, Program.Version) ? State.Newer : State.UpToDate;
+                    if (Status == State.Newer) Log.Info("Newer version available: " + tag);
+                    Raise();
+                }, null);
+            });
+        }
+
+        static void Raise() { if (Changed != null) Changed(); }
+
+        // "tag_name": "v0.5.2" -> "0.5.2"
+        public static string ParseTag(string json)
+        {
+            Match m = Regex.Match(json ?? "", "\"tag_name\"\\s*:\\s*\"v?([0-9][0-9.]*)");
+            return m.Success ? m.Groups[1].Value.TrimEnd('.') : null;
+        }
+
+        public static bool IsNewer(string latest, string current)
+        {
+            Version a, b;
+            return Version.TryParse(latest, out a) && Version.TryParse(current, out b) && a > b;
+        }
+
+        public static void OpenPage()
+        {
+            try { Process.Start(Page); }
+            catch (Exception ex) { Log.Error("Open the release page", ex); }
+        }
     }
 
     // ================================================================ Start with Windows
@@ -2561,7 +2642,9 @@ namespace Penombre
         HotkeyBox[] hotkeyBoxes;
         Label[] hotkeyStatus;
         // General
-        CheckBox startupBox, portableBox;
+        CheckBox startupBox, portableBox, updatesBox;
+        Label updateLabel;
+        GameButton updateGet;
         Label folderLabel;
 
         readonly Timer stateTimer;
@@ -3052,6 +3135,16 @@ namespace Penombre
             Section(t, T.S("sWindows"));
             startupBox = Check(T.S("startup")); Row(t, "", startupBox);
             portableBox = Check(T.S("portable")); Row(t, "", portableBox);
+            updatesBox = Check(T.S("updCheck")); Row(t, "", updatesBox);
+            var updateNow = new GameButton(T.S("updNow"), GameButton.Kind.Normal);
+            updateGet = new GameButton(string.Format(T.S("updSee"), "0.0.0"), GameButton.Kind.Normal) { Visible = false };
+            updateLabel = Muted("");
+            updateLabel.MaximumSize = new Size(Theme.Px(360), 0);
+            Row(t, "", Flow(updateNow, updateGet));
+            Row(t, "", updateLabel);
+            updatesBox.CheckedChanged += (s, e) => { if (!loading) { Settings.CheckUpdates = updatesBox.Checked; Commit(); } };
+            updateNow.Click += (s, e) => Updates.Check();
+            updateGet.Click += (s, e) => Updates.OpenPage();
             folderLabel = Muted("");
             folderLabel.MaximumSize = new Size(Theme.Px(360), 0);
             var openFolder = new GameButton(T.S("openFolder"), GameButton.Kind.Normal);
@@ -3238,6 +3331,8 @@ namespace Penombre
 
             startupBox.Checked = Startup.IsEnabled();
             portableBox.Checked = Settings.IsPortable;
+            updatesBox.Checked = Settings.CheckUpdates;
+            RefreshUpdate();
             loading = false;
             RefreshAccounts();
             UpdateLabels();
@@ -3340,6 +3435,21 @@ namespace Penombre
             if (preview != null) preview.Invalidate();
         }
 
+        public void RefreshUpdate()
+        {
+            switch (Updates.Status)
+            {
+                case Updates.State.Checking: updateLabel.Text = T.S("updChecking"); break;
+                case Updates.State.UpToDate: updateLabel.Text = string.Format(T.S("updLatest"), Program.Version); break;
+                case Updates.State.Newer: updateLabel.Text = string.Format(T.S("updNew"), Updates.Latest); break;
+                case Updates.State.Failed: updateLabel.Text = T.S("updFail"); break;
+                default: updateLabel.Text = ""; break;
+            }
+            updateLabel.ForeColor = Updates.Status == Updates.State.Newer ? Theme.GreenHi : Theme.Muted;
+            updateGet.Visible = Updates.Status == Updates.State.Newer;
+            if (updateGet.Visible) updateGet.Text = string.Format(T.S("updSee"), Updates.Latest);
+        }
+
         void ShowIconChoices()
         {
             foreach (IconChoice c in iconChoices)
@@ -3396,7 +3506,10 @@ namespace Penombre
         string registeredHotkeys = "";
         TrayState? currentState;
         int currentIconKey = -1;
-        ToolStripMenuItem enableItem, autoItem, presetMenu, intensityMenu, vignetteMenu, accountsMenu;
+        ToolStripMenuItem enableItem, autoItem, presetMenu, intensityMenu, vignetteMenu, accountsMenu, updateItem;
+        readonly Timer updateTimer;
+        string announced;   // version already announced in a balloon
+        bool balloonIsUpdate;
         SettingsForm settingsForm;
         bool warnedShader;
 
@@ -3432,10 +3545,44 @@ namespace Penombre
             stateTimer.Tick += (s, e) => RefreshUi();
             stateTimer.Start();
 
+            // Update check: a moment after start, then once a day (never in the self-test).
+            Updates.Changed += OnUpdates;
+            tray.BalloonTipClicked += (s, e) => { if (balloonIsUpdate) Updates.OpenPage(); };
+            updateTimer = new Timer { Interval = 15000 };
+            updateTimer.Tick += (s, e) =>
+            {
+                updateTimer.Interval = 24 * 60 * 60 * 1000;
+                if (Settings.CheckUpdates && !Program.SelfTestMode) Updates.Check();
+            };
+            updateTimer.Start();
+
             RefreshUi();
             string tip = string.Format(T.S("help"), Shortcuts.Format(Settings.Hotkeys[Shortcuts.Toggle]), Shortcuts.Format(Settings.Hotkeys[Shortcuts.Peek]));
             if (failedHotkeys.Count > 0) tip += "\n" + T.S("noHotkeys") + FailedNames();
+            balloonIsUpdate = false;
             tray.ShowBalloonTip(5000, "Pénombre " + Program.Version, tip, ToolTipIcon.None);
+        }
+
+        void OnUpdates()
+        {
+            bool newer = Updates.Status == Updates.State.Newer;
+            updateItem.Visible = newer;
+            if (newer)
+            {
+                updateItem.Text = string.Format(T.S("updMenu"), Updates.Latest);
+                if (announced != Updates.Latest)
+                {
+                    announced = Updates.Latest;
+                    Balloon(string.Format(T.S("updBalloon"), Updates.Latest), true);
+                }
+            }
+            if (settingsForm != null && !settingsForm.IsDisposed) settingsForm.RefreshUpdate();
+        }
+
+        void Balloon(string text, bool update)
+        {
+            balloonIsUpdate = update;
+            tray.ShowBalloonTip(update ? 8000 : 4000, "Pénombre", text, ToolTipIcon.None);
         }
 
         void RegisterHotkeys()
@@ -3572,7 +3719,7 @@ namespace Penombre
             var diag = new ToolStripMenuItem(T.S("diag"));
             diag.Click += (s, e) =>
             {
-                try { Clipboard.SetText(overlays.Diagnostics()); tray.ShowBalloonTip(2000, "Pénombre", T.S("diagDone"), ToolTipIcon.None); }
+                try { Clipboard.SetText(overlays.Diagnostics()); balloonIsUpdate = false; tray.ShowBalloonTip(2000, "Pénombre", T.S("diagDone"), ToolTipIcon.None); }
                 catch (Exception ex) { Log.Error("Diagnostics", ex); }
             };
 
@@ -3581,6 +3728,10 @@ namespace Penombre
 
             var quit = new ToolStripMenuItem(T.S("quit"));
             quit.Click += (s, e) => Application.Exit();
+
+            updateItem = new ToolStripMenuItem { Visible = false, ForeColor = Theme.GreenHi };
+            updateItem.Click += (s, e) => Updates.OpenPage();
+            menu.Items.Add(updateItem);
 
             menu.Items.Add(enableItem);
             menu.Items.Add(autoItem);
@@ -3597,6 +3748,7 @@ namespace Penombre
             menu.Opening += (s, e) => RefreshUi();
             menu.Font = Theme.Body(9.5f);
             settings.Font = Theme.Strong(9.5f);
+            updateItem.Font = Theme.Strong(9.5f);
             foreach (ToolStripMenuItem sub in new[] { presetMenu, intensityMenu, vignetteMenu, accountsMenu }) sub.DropDown.Font = menu.Font;
             tray.ContextMenuStrip = menu;
         }
@@ -3679,6 +3831,7 @@ namespace Penombre
             if (Settings.Shader && (overlays.ShaderFailed || !Mag.Ready) && !warnedShader)
             {
                 warnedShader = true;
+                balloonIsUpdate = false;
                 tray.ShowBalloonTip(4000, "Pénombre", T.S("noShader"), ToolTipIcon.Warning);
             }
         }
@@ -3715,6 +3868,8 @@ namespace Penombre
         public void Dispose()
         {
             stateTimer.Dispose();
+            updateTimer.Dispose();
+            Updates.Changed -= OnUpdates;
             if (settingsForm != null && !settingsForm.IsDisposed) settingsForm.Dispose();
             hotkeys.Dispose();
             overlays.Dispose();

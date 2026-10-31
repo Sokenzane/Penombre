@@ -928,6 +928,12 @@ namespace Penombre
             string defaults = Path.Combine(dir, "defaults.ini");
             Settings.SaveTo(defaults);
 
+            // Update check: reading the GitHub answer and comparing versions (no network here).
+            Check("update check reads the release tag", Updates.ParseTag("{\"url\":\"x\",\"tag_name\": \"v1.2.10\",\"name\":\"y\"}") == "1.2.10"
+                  && Updates.ParseTag("{\"message\":\"Not Found\"}") == null, "");
+            Check("update check compares versions", Updates.IsNewer("0.5.10", "0.5.9") && Updates.IsNewer("1.0", "0.9.9")
+                  && !Updates.IsNewer("0.5.1", "0.5.1") && !Updates.IsNewer("0.4.0", "0.5.1") && !Updates.IsNewer("x", "0.5.1"), "");
+
             // Sun: Paris, reference times from published ephemerides (local time, ±5 min).
             CheckSun(new DateTime(2026, 6, 21), 5 * 60 + 47, 21 * 60 + 58);
             CheckSun(new DateTime(2026, 12, 21), 8 * 60 + 42, 16 * 60 + 56);

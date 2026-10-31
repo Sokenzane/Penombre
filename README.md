@@ -37,6 +37,7 @@
   - [Plusieurs comptes](#plusieurs-comptes)
   - [Icône de la zone de notification](#icône-de-la-zone-de-notification)
   - [Mode portable et sauvegarde](#mode-portable-et-sauvegarde)
+  - [Mises à jour](#mises-à-jour)
 - [Fonctionnement](#fonctionnement)
   - [Rendus](#rendus)
   - [Multi-compte](#multi-compte)
@@ -62,7 +63,7 @@ Dofus 1.29 pouvait passer le jeu en mode nuit ; Dofus 3 ne le peut pas. Pénombr
 
 ## Est-ce sans risque pour mon compte ?
 
-Pénombre **ne touche jamais au client Dofus** : pas d'injection, pas de lecture mémoire, rien n'est envoyé au jeu ni aux serveurs. Le filtre est une fenêtre Windows à part, posée par-dessus le jeu, comme une teinte d'écran (f.lux, l'éclairage nocturne de Windows…). Il utilise seulement des fonctions publiques de Windows pour trouver les fenêtres du jeu et dessiner par-dessus.
+Pénombre **ne touche jamais au client Dofus** : pas d'injection, pas de lecture mémoire, rien n'est envoyé au jeu ni aux serveurs. Le filtre est une fenêtre Windows à part, posée par-dessus le jeu, comme une teinte d'écran (f.lux, l'éclairage nocturne de Windows…). Il utilise seulement des fonctions publiques de Windows pour trouver les fenêtres du jeu et dessiner par-dessus. Sa seule connexion à Internet est la [vérification des mises à jour](#mises-à-jour), vers GitHub.
 
 Ankama n'a ni examiné ni approuvé Pénombre. Lis toi-même les conditions d'utilisation du jeu, et utilise-le à tes risques.
 
@@ -107,7 +108,7 @@ Menu **Réglages…**. La fenêtre reprend l'esprit de l'interface de Dofus 3 : 
 | Comptes | réglages par compte |
 | Affichage | icône de la zone de notification, zones claires, « seulement quand Dofus est au premier plan » |
 | Raccourcis | tous les raccourcis, personnalisables |
-| Général | lancement au démarrage, mode portable, dossier des réglages, export / import, réinitialisation, journal |
+| Général | lancement au démarrage, mode portable, mises à jour, dossier des réglages, export / import, réinitialisation, journal |
 
 ### Ambiances
 
@@ -166,7 +167,12 @@ Trois styles au choix dans **Réglages… > Affichage**. Avec la case **Adapter 
 
 - **Mode portable** (onglet Général) : réglages et journal passent dans un dossier `Penombre-data` à côté de l'exe. Si ce dossier existe au lancement, Pénombre l'utilise d'office. Copie le dossier avec l'exe sur un autre PC, tout suit, zones comprises. Décoche pour les remettre dans `%APPDATA%`.
 - **Exporter… / Importer…** : enregistre tes réglages dans un fichier, ou charge un fichier enregistré sur un autre PC.
+- **Vérifier les mises à jour** : voir [Mises à jour](#mises-à-jour).
 - **Réinitialiser les réglages…** : remet tout comme au premier lancement (après confirmation). Le journal, le dossier des réglages et le lancement au démarrage restent tels quels.
+
+### Mises à jour
+
+Au lancement, puis une fois par jour, Pénombre demande à GitHub quelle est la dernière version publiée. Si elle est plus récente, une bulle le signale, et une ligne **Nouvelle version disponible…** apparaît en haut du menu : un clic ouvre la page de téléchargement. Rien n'est téléchargé ni installé tout seul. GitHub ne voit que ton adresse IP, comme pour n'importe quelle page web. Décoche **Vérifier les mises à jour** (onglet Général) pour ne jamais te connecter ; le bouton **Vérifier maintenant** reste disponible.
 
 ## Fonctionnement
 

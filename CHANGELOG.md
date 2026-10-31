@@ -12,6 +12,7 @@
 
 ## Non publié
 
+- Nouvelle **vérification des mises à jour** : une fois par jour, Pénombre demande à GitHub si une version plus récente existe et le signale (bulle, ligne dans le menu, onglet Général). Rien n'est téléchargé tout seul ; désactivable
 - L'icône adaptative suit l'heure même quand le mode automatique est coupé (elle restait sur « nuit »)
 
 ## 0.5.1
