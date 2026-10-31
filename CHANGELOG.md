@@ -2,9 +2,44 @@
 
 ## Contents
 
+- [0.5.0](#050)
+- [0.4.0](#040)
 - [0.3.0](#030)
 - [0.2.0](#020)
 - [0.1.0](#010)
+
+## 0.5.0
+
+- New **look** for the settings window, in the spirit of the Dofus 3 interface: sections on the left, slate panels in relief, green sliders with a gem handle, glowing buttons, embedded Nunito font
+- New **live preview** in the Mood section: a part of the game without and with the filter
+- Moods shown as **swatches**, each one seen through its own filter
+- New **notification area icons**: a moon egg that changes with the sky (default), a watcher egg that sleeps by day, or a round moon; chosen in Display
+- New icon and logo (the moon egg)
+- Times are typed in a dark time field; the tray menu uses the same colors
+- The self-test checks the new pages, the fonts and the 36 notification icon pictures
+
+## 0.4.0
+
+- New **per-account settings**: a character can use its own mood, intensity and vignette instead of the default ones; settings are kept for characters that are not open
+- New **smooth transition** between moods, intensities and vignettes
+- New **peek** shortcut (`Ctrl+Alt+C` by default): hold it to see the game without filter
+- New **customizable shortcuts** (Shortcuts tab), with unavailable ones flagged
+- New **real sunset and sunrise** schedule: pick a city or coordinates, computed offline
+- New **notification area moon** that reflects the state: full, crescent, outline, grey
+- New **only when Dofus is in the foreground** option
+- New **vignette tint** and optional animated **film grain**
+- New **portable mode**: settings and log in a `Penombre-data` folder next to the exe
+- New **export / import** of the settings
+- Bright zones can be **anchored to their nearest edge** and **grow with the window height** (default)
+- Settings window reorganized in tabs
+- Fixed: the diagnostics and the log showed Windows 6.2 instead of the real Windows version
+- Fixed: the settings tabs could be too small for their content and show scroll bars; they are now sized on the largest tab
+- A filter hidden or minimized by another program is shown again automatically
+- Fixed: hovering a taskbar button (window previews) or Alt+Tab cut a band across the whole width of the filter
+- Fixed: a filter just created, shown again or cut around a bright zone could stay invisible for a moment; it is now drawn right away
+- Performance: shader frames are drawn by a render pump when the app is idle, instead of on the timer; they never delay shortcuts or window tracking. The shader runs at about 30 frames per second, the pace of the Windows Magnification API; Dofus windows that are not in front are refreshed at a quarter of that rate
+- The peek shortcut stops by itself after one minute, in case a key stays stuck
+- New self-test (`tools\selftest.bat`, test build only) that drives the app over running Dofus windows (one or several accounts) and checks 116 points
 
 ## 0.3.0
 

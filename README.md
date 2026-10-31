@@ -32,6 +32,8 @@
   - [Automatic mode](#automatic-mode)
   - [Bright zones](#bright-zones)
   - [Several accounts](#several-accounts)
+  - [Notification area icon](#notification-area-icon)
+  - [Portable mode and backup](#portable-mode-and-backup)
 - [How it works](#how-it-works)
   - [Renderers](#renderers)
   - [Multi-account](#multi-account)
@@ -49,9 +51,11 @@
 
 - **Real color rework** (shader): every pixel is redrawn through a color matrix, not just covered with a dark layer.
 - **Moods**: blue night, moonlight, dusk, pitch black, old-school night, or your own.
-- **Follows the real time** if you want: dusk, night, dawn and day, with smooth transitions.
-- **Multi-account ready**: one filter per Dofus window, which never stacks up.
+- **Follows the real time** if you want, with fixed times or the **real sunset and sunrise** of your city, and smooth transitions.
+- **Multi-account ready**: one filter per Dofus window, which never stacks up, and **per-account settings**.
 - **Bright zones**: keep the spell bar or the chat readable.
+- **Peek**: hold a shortcut to see the game without filter.
+- Optional **vignette** (with your own tint) and **film grain**.
 
 ## Is it safe for my account?
 
@@ -69,28 +73,33 @@ Dofus must run **windowed** or **fullscreen windowed**: in exclusive fullscreen,
 
 ## How to use
 
-Run `Penombre.exe`: a moon appears in the notification area (next to the clock, sometimes hidden behind the `^` arrow). Left-click it to turn the filter on or off, right-click it for the menu.
+Run `Penombre.exe`: a moon egg appears in the notification area (next to the clock, sometimes hidden behind the `^` arrow). Left-click it to turn the filter on or off, right-click it for the menu.
 
 ### Keyboard shortcuts
 
-| Shortcut | Action |
+| Default shortcut | Action |
 | --- | --- |
 | `Ctrl+Alt+N` | Filter on / off (with a fade) |
+| `Ctrl+Alt+C` | **Peek**: hold it to see the game without filter |
 | `Ctrl+Alt+A` | Automatic mode on / off |
 | `Ctrl+Alt+P` | Next mood |
 | `Ctrl+Alt+PgUp` / `PgDn` | Intensity +5 % / -5 % |
 | `Ctrl+Alt+V` | Next vignette (none, light, medium, strong) |
 
+Every shortcut can be changed in **Settings… > Shortcuts** (click a box, press the new combination; `Backspace` removes it). A shortcut already taken by another app is marked *unavailable*. When the Dofus in the foreground has its [own settings](#several-accounts), the mood, intensity and vignette shortcuts change those.
+
 ### Settings window
 
-Menu **Settings…**. Everything applies live:
+Menu **Settings…**. The window follows the spirit of the Dofus 3 interface: sections on the left, green sliders and buttons. Everything applies live, with a smooth transition:
 
-- mood, custom mood sliders, intensity, vignette, renderer;
-- automatic mode and its four times;
-- fade duration (0 to 2 s);
-- bright zones;
-- filtered accounts;
-- start with Windows, access to the log.
+| Tab | Content |
+| --- | --- |
+| Mood | live preview (a part of the game without and with the filter), moods as swatches, custom mood sliders, intensity, vignette and its tint, film grain, renderer |
+| Schedule | automatic mode (fixed times or real sun), transition duration (0 to 2 s) |
+| Accounts | per-account settings |
+| Display | notification area icon, bright zones, "only when Dofus is in the foreground" |
+| Shortcuts | every shortcut, customizable |
+| General | start with Windows, portable mode, settings folder, export / import, log |
 
 ### Moods
 
@@ -109,7 +118,10 @@ Moving a slider in the settings creates a **Custom** mood from the current one.
 
 ### Automatic mode
 
-The filter follows your PC's clock:
+The filter follows your PC's clock, with two ways to set the times:
+
+- **Fixed times** (below);
+- **Real sunset and sunrise**: pick your city (or enter coordinates). Night falls 45 min before sunset and is complete 45 min after; dawn works the same way around sunrise. Computed offline, so the times follow the seasons.
 
 | Moment | Default | Filter |
 | --- | --- | --- |
@@ -120,11 +132,28 @@ The filter follows your PC's clock:
 
 ### Bright zones
 
-To keep the spell bar, the chat or the timeline readable: **Settings… > Draw the zones…**. A layer appears over the Dofus window: drag to draw a zone, right-click a zone to remove it, `Del` to clear all, `Enter` to save, `Esc` to cancel. Zones are proportional to the window size and apply to every account.
+To keep the spell bar, the chat or the timeline readable: **Settings… > Draw the zones…**. A layer appears over the Dofus window: drag to draw a zone, right-click a zone to remove it, `Del` to clear all, `Enter` to save, `Esc` to cancel. Zones apply to every account. By default they are **anchored to their nearest edge** (a spell bar at the bottom stays at the bottom) and **grow with the window height**, like the Dofus interface; untick both options in **Display** for zones proportional to the window.
 
 ### Several accounts
 
-Each character can be filtered or not, from the **Accounts** menu or the settings. The character is recognized from its window title.
+Each character can be filtered or not, from the **Accounts** menu or the settings. In **Settings… > Accounts**, a character can also get **its own mood, intensity and vignette** instead of the default ones. Characters are recognized from their window title, and their settings are kept even when they are not open.
+
+Option **Only when Dofus is in the foreground** (Display tab): the filter only shows on the Dofus window you are playing.
+
+### Notification area icon
+
+The icon shows the state at a glance: night, dusk or dawn, day (automatic mode, no filter), filter off. Three styles to choose from in **Settings… > Display**:
+
+| Style | Night | Dusk | Day | Off |
+| --- | --- | --- | --- | --- |
+| **Moon egg** (default) | sapphire egg, golden moon | pink and amber egg | amber egg, sun | cracked stone egg |
+| **Watcher egg** | eyes open | eyes open | asleep | grey, asleep |
+| **Round moon** | full moon | crescent | outline | grey crescent |
+
+### Portable mode and backup
+
+- **Portable mode** (General tab): settings and log move to a `Penombre-data` folder next to the exe. Copy the folder with the exe to another PC and everything comes along, zones included. Untick it to move them back to `%APPDATA%`.
+- **Export… / Import…**: save your settings to a file, or load a file saved on another PC.
 
 ## How it works
 
@@ -150,35 +179,36 @@ Click-through windows (GPU, Discord or Steam overlays…), invisible and cloaked
 
 ## Files
 
-In `%APPDATA%\Penombre\`:
+In `%APPDATA%\Penombre\` (or `Penombre-data` next to the exe in [portable mode](#portable-mode-and-backup)):
 
-- `settings.ini`: all the settings. If your client is not called `Dofus.exe`, edit the `process=` line. Delete the file to reset everything.
+- `settings.ini`: all the settings, per-account settings and shortcuts included. If your client is not called `Dofus.exe`, edit the `process=` line. Delete the file to reset everything.
 - `penombre.log`: the log (start, game windows found, errors). Past 512 KB it is renamed to `penombre.log.old`.
 
 The interface follows the Windows display language (French or English); `--lang=fr` or `--lang=en` forces it. Start with Windows writes one value under `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`; nothing else is written to your system.
 
 ## Diagnostics and log
 
-- **Copy diagnostics**: copies the full state to the clipboard (Dofus windows, filters, automatic mode, zones, Windows Z-order). It contains your window titles, so your character names: hide them before posting it publicly if you prefer.
+- **Copy diagnostics**: copies the full state to the clipboard (Windows version, Dofus windows, filters, automatic mode, zones, accounts, Windows Z-order). It contains your window titles, so your character names: hide them before posting it publicly if you prefer.
 - **Open the log**: opens `penombre.log` in Notepad.
 
 ## Known limitations
 
 - Exclusive fullscreen is not supported (see [Download](#download)).
-- The game interface is darkened too, unless you set [bright zones](#bright-zones). Zones are proportional: if the Dofus interface does not grow with the window, redraw them after a big resize.
+- The game interface is darkened too, unless you set [bright zones](#bright-zones). If they drift after a resize, try the other zone options or redraw them.
 - The shader is a per-pixel color transform (matrix), not a programmable GPU shader: no blur, bloom or local lighting.
 - With the shader, the filtered picture can be one frame behind the game.
-- Not tested yet: screens with different scaling (e.g. 100 % and 125 %).
+- Film grain uses about 25 MB of memory per Dofus window, and takes a fraction of a second to prepare when turned on or when the window is resized.
+- Sun times assume your PC's time zone is the one of the chosen city.
 
 ## Build from source
 
-Everything is in one file, [`src/Penombre.cs`](src/Penombre.cs) (C# 5, WinForms, no dependency).
+The code is in [`src/Penombre.cs`](src/Penombre.cs) and the interface in [`src/Interface.cs`](src/Interface.cs) (C# 5, WinForms, no dependency).
 
 1. Clone or download the repository.
 2. Double-click **`build.bat`**: it uses the C# compiler that ships with Windows.
 3. Run `dist\Penombre.exe`.
 
-The icon and logo are generated by `python tools/make_icon.py` (needs Pillow).
+The icons and the logo are generated by `python tools/make_icon.py` (needs Pillow and Playwright).
 
 ## Contributing
 
@@ -190,5 +220,7 @@ Pénombre is free software, released under the [GNU General Public License v3.0]
 You can use, study, share and modify it; modified versions you distribute must stay open source under the same license and credit the original project.
 
 Copyright © 2026 [Sokenzane](https://github.com/Sokenzane).
+
+The [Nunito](https://github.com/googlefonts/nunito) font (© The Nunito Project Authors), embedded in the exe, is under the [SIL Open Font License 1.1](assets/fonts/OFL.txt).
 
 Pénombre is an independent fan project, not affiliated with or endorsed by Ankama. Dofus is a trademark of Ankama. No game asset is included in this repository.
