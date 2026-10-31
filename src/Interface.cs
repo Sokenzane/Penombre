@@ -1305,14 +1305,17 @@ namespace Penombre
         }
     }
 
-    // One of the notification area icon styles, chosen like a radio button.
+    // One of the notification area icon styles, chosen like a radio button. Its pictures show the
+    // states of the icon; with ChooseShade, a click on one of the coloured pictures also picks it.
     class IconChoice : Control
     {
         public readonly int Style;
         readonly string title, description;
         readonly Font titleFont, descFont;
-        bool selected, hover;
+        bool selected, hover, chooseShade;
+        int shade, hoverSlot = -1, downSlot = -1;
         public event EventHandler Picked;
+        public int PickedShade { get; private set; } // picture clicked for the last Picked, or -1
 
         public IconChoice(int style, string title, string description)
         {
@@ -1338,15 +1341,68 @@ namespace Penombre
             set { selected = value; AccessibleDescription = description + (value ? " ✓" : ""); Invalidate(); }
         }
 
-        void Pick() { if (Picked != null) Picked(this, EventArgs.Empty); }
-        protected override void OnClick(EventArgs e) { base.OnClick(e); Focus(); Pick(); }
+        public bool ChooseShade
+        {
+            get { return chooseShade; }
+            set { chooseShade = value; Invalidate(); }
+        }
+
+        // The picture kept while the filter is on (TrayIcons.Night, Twilight or Day), shown when ChooseShade.
+        public int Shade
+        {
+            get { return shade; }
+            set { shade = Math.Max(0, Math.Min(TrayIcons.Off - 1, value)); Invalidate(); }
+        }
+
+        void Pick(int slot)
+        {
+            PickedShade = slot;
+            if (Picked != null) Picked(this, EventArgs.Empty);
+        }
+
+        Rectangle SlotRect(int s)
+        {
+            int slot = Theme.Px(38), gap = Theme.Px(6);
+            int right = Width - Theme.Px(3) - 1 - Theme.Px(10);
+            int x = right - TrayIcons.StateCount * slot - (TrayIcons.StateCount - 1) * gap;
+            int y = (Height - slot) / 2;
+            return new Rectangle(x + s * (slot + gap), y, slot, slot);
+        }
+
+        // The coloured picture under the point, or -1 (the grey one is never picked: it means "filter off").
+        int SlotAt(Point p)
+        {
+            if (!chooseShade) return -1;
+            for (int s = 0; s < TrayIcons.Off; s++) if (SlotRect(s).Contains(p)) return s;
+            return -1;
+        }
+
+        protected override void OnMouseDown(MouseEventArgs e) { downSlot = SlotAt(e.Location); base.OnMouseDown(e); }
+        protected override void OnClick(EventArgs e) { base.OnClick(e); Focus(); Pick(downSlot); }
         protected override void OnKeyDown(KeyEventArgs e)
         {
             base.OnKeyDown(e);
-            if (e.KeyCode == Keys.Space || e.KeyCode == Keys.Enter) { Pick(); e.Handled = true; }
+            if (e.KeyCode == Keys.Space || e.KeyCode == Keys.Enter) { Pick(-1); e.Handled = true; }
+            else if (chooseShade && (e.KeyCode == Keys.Left || e.KeyCode == Keys.Right))
+            {
+                int next = shade + (e.KeyCode == Keys.Left ? -1 : 1);
+                if (next >= 0 && next < TrayIcons.Off) Pick(next);
+                e.Handled = true;
+            }
+        }
+        protected override bool IsInputKey(Keys keyData)
+        {
+            Keys k = keyData & Keys.KeyCode;
+            return chooseShade && (k == Keys.Left || k == Keys.Right) || base.IsInputKey(keyData);
+        }
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            int s = SlotAt(e.Location);
+            if (s != hoverSlot) { hoverSlot = s; Invalidate(); }
+            base.OnMouseMove(e);
         }
         protected override void OnMouseEnter(EventArgs e) { hover = true; Invalidate(); base.OnMouseEnter(e); }
-        protected override void OnMouseLeave(EventArgs e) { hover = false; Invalidate(); base.OnMouseLeave(e); }
+        protected override void OnMouseLeave(EventArgs e) { hover = false; hoverSlot = -1; Invalidate(); base.OnMouseLeave(e); }
         protected override void OnGotFocus(EventArgs e) { Invalidate(); base.OnGotFocus(e); }
         protected override void OnLostFocus(EventArgs e) { Invalidate(); base.OnLostFocus(e); }
 
@@ -1378,21 +1434,22 @@ namespace Penombre
             TextRenderer.DrawText(g, title, titleFont, new Point(tx, (int)r.Y + Theme.Px(8)), selected ? Theme.GreenHi : Theme.Text, TextFormatFlags.NoPadding);
             TextRenderer.DrawText(g, description, descFont, new Point(tx, (int)r.Y + Theme.Px(30)), selected ? Color.FromArgb(0xd8, 0xe8, 0xc0) : Theme.Muted, TextFormatFlags.NoPadding);
 
-            // the four states, in slots like the game's inventory
-            int slot = Theme.Px(38), gap = Theme.Px(6), icon = Theme.Px(28);
-            int x = (int)r.Right - Theme.Px(10) - TrayIcons.StateCount * slot - (TrayIcons.StateCount - 1) * gap;
-            int y = (int)(r.Y + (r.Height - slot) / 2);
+            // the four states, in slots like the game's inventory; the kept one glows when pictures can be chosen
+            int icon = Theme.Px(28);
             for (int s = 0; s < TrayIcons.StateCount; s++)
             {
-                var cell = new Rectangle(x + s * (slot + gap), y, slot, slot);
+                Rectangle cell = SlotRect(s);
+                bool kept = chooseShade && selected && s == shade;
+                bool lit = chooseShade && s == hoverSlot;
                 using (GraphicsPath p = Theme.Round(cell, Theme.Px(6)))
                 {
-                    using (var b = new PathGradientBrush(p) { CenterColor = Color.FromArgb(0x3e, 0x3a, 0x5a), SurroundColors = new[] { Color.FromArgb(0x1e, 0x1c, 0x2a) } })
+                    if (kept) Theme.Glow(g, p, Theme.GreenHi, Theme.Px(3));
+                    using (var b = new PathGradientBrush(p) { CenterColor = lit ? Color.FromArgb(0x52, 0x4c, 0x76) : Color.FromArgb(0x3e, 0x3a, 0x5a), SurroundColors = new[] { Color.FromArgb(0x1e, 0x1c, 0x2a) } })
                         g.FillPath(b, p);
-                    using (var pen = new Pen(Color.FromArgb(0x7a, 0x74, 0xa0))) g.DrawPath(pen, p);
+                    using (var pen = new Pen(kept ? Theme.GreenHi : lit ? Color.FromArgb(0xb0, 0xaa, 0xd8) : Color.FromArgb(0x7a, 0x74, 0xa0), kept ? Theme.Px(2) : 1)) g.DrawPath(pen, p);
                 }
                 Bitmap bmp = TrayIcons.Picture(Style, s, icon);
-                if (bmp != null) g.DrawImage(bmp, cell.X + (slot - icon) / 2, cell.Y + (slot - icon) / 2, icon, icon);
+                if (bmp != null) g.DrawImage(bmp, cell.X + (cell.Width - icon) / 2, cell.Y + (cell.Height - icon) / 2, icon, icon);
             }
         }
 

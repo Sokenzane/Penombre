@@ -141,7 +141,7 @@ Option **Seulement quand Dofus est au premier plan** (onglet Affichage) : le fil
 
 ### Icône de la zone de notification
 
-L'icône montre l'état d'un coup d'œil. En [mode automatique](#mode-automatique), elle suit le ciel : nuit, crépuscule ou aube, jour (pas de filtre). Sans mode automatique, elle reste sur « nuit » tant que le filtre est actif. Trois styles au choix dans **Réglages… > Affichage** :
+Trois styles au choix dans **Réglages… > Affichage**. Avec la case **Adapter l'icône à l'heure** (par défaut), l'icône suit le ciel du [mode automatique](#mode-automatique) : nuit, crépuscule ou aube, jour (pas de filtre). Sans mode automatique, elle reste sur « nuit » tant que le filtre est actif. Case décochée, clique sur l'image de ton choix (nuit, crépuscule ou jour) pour la garder en permanence. Dans tous les cas, l'image grise indique un filtre coupé.
 
 | Style | Nuit | Crépuscule | Jour | Coupé |
 | --- | --- | --- | --- | --- |

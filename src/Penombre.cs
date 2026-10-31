@@ -537,8 +537,9 @@ namespace Penombre
             { "sIcon",      new[] { "Icon near the clock", "Icône près de l'horloge" } },
             { "ico0",       new[] { "Moon egg", "Œuf de lune" } },
             { "ico0d",      new[] { "Changes colour with the sky (default)", "Change de couleur avec le ciel (par défaut)" } },
-            { "iconHint",   new[] { "The icon follows the sky in automatic mode (night, dusk, day). Without it, it only shows whether the filter is on.",
-                                    "L'icône suit le ciel en mode automatique (nuit, crépuscule, jour). Sans lui, elle indique seulement si le filtre est actif." } },
+            { "iconAuto",   new[] { "Match the icon to the time of day (automatic mode)", "Adapter l'icône à l'heure (mode automatique)" } },
+            { "iconHint",   new[] { "Ticked: the icon follows the sky of the automatic mode (night, dusk, day). Unticked: click the picture you want to keep. The grey picture always means the filter is off.",
+                                    "Coché : l'icône suit le ciel du mode automatique (nuit, crépuscule, jour). Décoché : clique sur l'image de ton choix pour la garder. L'image grise indique toujours un filtre coupé." } },
             { "ico1",       new[] { "Watcher egg", "Œuf veilleur" } },
             { "ico1d",      new[] { "Awake at night, asleep by day", "Veille la nuit, dort le jour" } },
             { "ico2",       new[] { "Round moon", "Lune bombée" } },
@@ -1053,6 +1054,8 @@ namespace Penombre
         public static List<Zone> Zones = new List<Zone>();
         public static bool OnlyForeground = false;
         public static int TrayIcon = 0;             // 0 moon egg, 1 watcher egg, 2 round moon
+        public static bool TrayIconAuto = true;     // the icon follows the sky of the automatic mode
+        public static int TrayIconColor = 0;        // otherwise, the picture kept while the filter is on (TrayIcons.Night / Twilight / Day)
 
         public static Dictionary<string, AccountProfile> Accounts = new Dictionary<string, AccountProfile>();
         public static Keys[] Hotkeys = Shortcuts.Defaults();
@@ -1200,6 +1203,8 @@ namespace Penombre
                             break;
                         case "onlyForeground": OnlyForeground = v == "1"; break;
                         case "trayIcon": if (int.TryParse(v, out n)) TrayIcon = Math.Max(0, Math.Min(2, n)); break;
+                        case "trayIconAuto": TrayIconAuto = v != "0"; break;
+                        case "trayIconColor": if (int.TryParse(v, out n)) TrayIconColor = Math.Max(0, Math.Min(2, n)); break;
                     }
                 }
                 return true;
@@ -1262,6 +1267,8 @@ namespace Penombre
                 "zones2=" + string.Join(";", zones.ToArray()),
                 "onlyForeground=" + (OnlyForeground ? "1" : "0"),
                 "trayIcon=" + TrayIcon,
+                "trayIconAuto=" + (TrayIconAuto ? "1" : "0"),
+                "trayIconColor=" + TrayIconColor,
             };
             for (int i = 0; i < Shortcuts.Count; i++) lines.Add("hotkey." + Shortcuts.SettingNames[i] + "=" + (int)Hotkeys[i]);
             foreach (var kv in Accounts)
@@ -2524,7 +2531,7 @@ namespace Penombre
         Button accForget;
         // Display
         IconChoice[] iconChoices;
-        CheckBox zonesBox, zonesAnchor, zonesScale, onlyFgBox;
+        CheckBox zonesBox, zonesAnchor, zonesScale, onlyFgBox, iconAutoBox;
         Label zonesInfo;
         // Shortcuts
         HotkeyBox[] hotkeyBoxes;
@@ -2954,14 +2961,25 @@ namespace Penombre
         void BuildDisplay(TableLayoutPanel t)
         {
             Section(t, T.S("sIcon"));
+            iconAutoBox = Check(T.S("iconAuto"));
+            Wide(t, iconAutoBox);
+            iconAutoBox.CheckedChanged += (s, e) =>
+            {
+                if (loading) return;
+                Settings.TrayIconAuto = iconAutoBox.Checked;
+                ShowIconChoices();
+                Commit();
+            };
             iconChoices = new IconChoice[TrayIcons.StyleCount];
             for (int i = 0; i < iconChoices.Length; i++)
             {
                 var c = new IconChoice(i, T.S("ico" + i), T.S("ico" + i + "d"));
                 c.Picked += (s, e) =>
                 {
-                    Settings.TrayIcon = ((IconChoice)s).Style;
-                    foreach (IconChoice x in iconChoices) x.Selected = x.Style == Settings.TrayIcon;
+                    var picked = (IconChoice)s;
+                    Settings.TrayIcon = picked.Style;
+                    if (picked.PickedShade >= 0) Settings.TrayIconColor = picked.PickedShade;
+                    ShowIconChoices();
                     Commit();
                 };
                 iconChoices[i] = c;
@@ -3172,7 +3190,8 @@ namespace Penombre
             lonBox.Value = Clamp(Settings.SunLon, lonBox.Minimum, lonBox.Maximum);
             fade.Value = Math.Min(fade.Maximum, Settings.FadeMs);
 
-            foreach (IconChoice c in iconChoices) c.Selected = c.Style == Settings.TrayIcon;
+            iconAutoBox.Checked = Settings.TrayIconAuto;
+            ShowIconChoices();
             zonesBox.Checked = Settings.ZonesEnabled;
             zonesAnchor.Checked = Settings.ZonesAnchored;
             zonesScale.Checked = Settings.ZonesScale;
@@ -3282,6 +3301,16 @@ namespace Penombre
             int open = manager.Count;
             footer.SetStatus(Settings.Enabled ? string.Format(T.S("statusOn"), open) : T.S("statusOff"), Settings.Enabled);
             if (preview != null) preview.Invalidate();
+        }
+
+        void ShowIconChoices()
+        {
+            foreach (IconChoice c in iconChoices)
+            {
+                c.ChooseShade = !Settings.TrayIconAuto;
+                c.Shade = Settings.TrayIconColor;
+                c.Selected = c.Style == Settings.TrayIcon;
+            }
         }
 
         void Commit()
@@ -3583,13 +3612,14 @@ namespace Penombre
 
             TrayState now = !Settings.Enabled ? TrayState.Off : f <= 0 ? TrayState.Day : f >= 1 ? TrayState.Night : TrayState.Twilight;
             currentState = now;
-            int key = Settings.TrayIcon * TrayIcons.StateCount + StateOf(now);
+            int picture = Settings.Enabled && !Settings.TrayIconAuto ? Settings.TrayIconColor : StateOf(now);
+            int key = Settings.TrayIcon * TrayIcons.StateCount + picture;
             if (key != currentIconKey)
             {
                 Icon icon;
                 if (!trayIcons.TryGetValue(key, out icon))
                 {
-                    icon = TrayIcons.Make(Settings.TrayIcon, StateOf(now), SystemInformation.SmallIconSize.Width) ?? AppIcon;
+                    icon = TrayIcons.Make(Settings.TrayIcon, picture, SystemInformation.SmallIconSize.Width) ?? AppIcon;
                     trayIcons[key] = icon;
                 }
                 currentIconKey = key;

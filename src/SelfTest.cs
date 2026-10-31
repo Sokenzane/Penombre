@@ -1059,6 +1059,15 @@ namespace Penombre
                 Settings.TrayIcon = 0; app.NotifyChanged();
                 Check("notification icon follows the chosen style", watcher / TrayIcons.StateCount == 1 && moon / TrayIcons.StateCount == 2 && app.IconKey / TrayIcons.StateCount == 0,
                       watcher + " / " + moon + " / " + app.IconKey);
+
+                bool wasEnabled = Settings.Enabled;
+                Settings.Enabled = true; Settings.TrayIconAuto = false; Settings.TrayIconColor = TrayIcons.Twilight; app.NotifyChanged();
+                int kept = app.IconKey;
+                Settings.Enabled = false; app.NotifyChanged();
+                int off = app.IconKey;
+                Settings.Enabled = wasEnabled; Settings.TrayIconAuto = true; Settings.TrayIconColor = TrayIcons.Night; app.NotifyChanged();
+                Check("notification icon keeps the chosen picture, grey when the filter is off",
+                      kept % TrayIcons.StateCount == TrayIcons.Twilight && off % TrayIcons.StateCount == TrayIcons.Off, kept + " / " + off);
             }, 300);
         }
 

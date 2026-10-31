@@ -15,6 +15,7 @@
 - Ambiances présentées en **vignettes**, chacune vue à travers son propre filtre
 - Nouvelles **icônes de la zone de notification** : un œuf de lune qui change avec le ciel (par défaut), un œuf veilleur qui dort le jour, ou une lune bombée ; au choix dans Affichage
 - Nouvelle icône et nouveau logo (l'œuf de lune)
+- L'icône peut suivre l'heure (par défaut) ou garder une couleur au choix : case **Adapter l'icône à l'heure**, puis clic sur l'image voulue
 - Les heures se saisissent dans un champ horaire sombre ; le menu de la zone de notification reprend les mêmes couleurs
 - Relancer Pénombre alors qu'il tourne déjà ouvre sa fenêtre de réglages
 - Rubrique Comptes : changer l'ambiance, l'intensité ou le vignettage d'un personnage active aussitôt ses réglages propres (les contrôles restaient grisés tant que la case n'était pas cochée)
