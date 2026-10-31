@@ -1460,6 +1460,44 @@ namespace Penombre
         }
     }
 
+    // Small "FR ▾" chip in the header of the settings window: opens the language menu.
+    class LanguageChip : Control
+    {
+        bool hover;
+
+        public LanguageChip()
+        {
+            SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.SupportsTransparentBackColor, true);
+            BackColor = Color.Transparent;
+            Font = Theme.Strong(8f);
+            Size = new Size(Theme.Px(46), Theme.Px(24));
+            Theme.Hand(this);
+        }
+
+        protected override void OnMouseEnter(EventArgs e) { hover = true; Invalidate(); base.OnMouseEnter(e); }
+        protected override void OnMouseLeave(EventArgs e) { hover = false; Invalidate(); base.OnMouseLeave(e); }
+        protected override void OnTextChanged(EventArgs e) { Invalidate(); base.OnTextChanged(e); }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            Graphics g = e.Graphics;
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+            var r = new RectangleF(0.5f, 0.5f, Width - 1.5f, Height - 1.5f);
+            using (GraphicsPath p = Theme.Round(r, Theme.Px(5)))
+            {
+                if (hover) using (var b = new SolidBrush(Color.FromArgb(40, Color.White))) g.FillPath(b, p);
+                using (var pen = new Pen(hover ? Theme.GreenHi : Color.FromArgb(0x4a, 0x48, 0x55))) g.DrawPath(pen, p);
+            }
+            Color c = hover ? Theme.Text : Theme.Muted;
+            TextRenderer.DrawText(g, Text, Font, new Rectangle(Theme.Px(6), 0, Width - Theme.Px(18), Height), c,
+                                  TextFormatFlags.VerticalCenter | TextFormatFlags.HorizontalCenter | TextFormatFlags.NoPadding);
+            // chevron
+            float cx = Width - Theme.Px(11), cy = Height / 2f + Theme.Px(1);
+            using (var pen = new Pen(c, Theme.Px(1.5f)))
+                g.DrawLines(pen, new[] { new PointF(cx - Theme.Px(3), cy - Theme.Px(2)), new PointF(cx, cy + Theme.Px(1)), new PointF(cx + Theme.Px(3), cy - Theme.Px(2)) });
+        }
+    }
+
     // Header of the settings window: the egg, the glowing title, and a drag area.
     class HeaderBar : Panel
     {

@@ -211,7 +211,7 @@ En `%APPDATA%\Penombre\` (o `Penombre-data` junto al exe en [modo portátil](#mo
 - `settings.ini`: todos los ajustes, incluidos los de cada cuenta y los atajos. Si tu cliente no se llama `Dofus.exe`, cambia la línea `process=`. Para volver a empezar: **Restablecer los ajustes…** (sección General), o borra el archivo.
 - `penombre.log`: el registro (inicio, ventanas detectadas, errores). Pasados 512 KB, se renombra a `penombre.log.old`.
 
-La interfaz sigue el idioma de Windows (francés, inglés o español); `--lang=fr`, `--lang=en` o `--lang=es` fuerza el idioma. El inicio con Windows escribe un único valor en `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`; no se escribe nada más en tu sistema.
+La interfaz sigue el idioma de Windows (francés, inglés o español). Para elegir otro, haz clic en el pequeño botón de idioma (`ES ▾`) arriba a la izquierda de la ventana de ajustes; `--lang=fr`, `--lang=en` o `--lang=es` lo fuerza al iniciar. El inicio con Windows escribe un único valor en `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`; no se escribe nada más en tu sistema.
 
 ## Diagnóstico y registro
 

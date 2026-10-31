@@ -211,7 +211,7 @@ In `%APPDATA%\Penombre\` (or `Penombre-data` next to the exe in [portable mode](
 - `settings.ini`: every setting, including per-account settings and shortcuts. If your client is not called `Dofus.exe`, edit the `process=` line. To start over: **Reset settings…** (General section), or delete the file.
 - `penombre.log`: the log (start, windows found, errors). Past 512 KB, it is renamed `penombre.log.old`.
 
-The interface follows the Windows language (French, English or Spanish); `--lang=fr`, `--lang=en` or `--lang=es` forces it. Start with Windows writes a single value under `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`; nothing else is written to your system.
+The interface follows the Windows language (French, English or Spanish). To pick another one, click the small language button (`EN ▾`) at the top left of the settings window; `--lang=fr`, `--lang=en` or `--lang=es` forces it at start. Start with Windows writes a single value under `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`; nothing else is written to your system.
 
 ## Diagnostics and log
 

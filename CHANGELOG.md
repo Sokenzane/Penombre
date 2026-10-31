@@ -16,6 +16,8 @@
 - Nouvelle **teinte de crépuscule** en mode automatique : quand la nuit tombe et quand le jour se lève, le filtre passe par les couleurs chaudes de l'ambiance Crépuscule (onglet Horaires, désactivable)
 - Nouvelle **pause** dans le menu : coupe le filtre 15 min, 30 min, 1 h ou 2 h, puis le remet tout seul
 - Interface en **espagnol** (suit la langue de Windows, ou `--lang=es`), et README en anglais et en espagnol
+- Nouveau bouton de **langue** en haut à gauche de la fenêtre de réglages : langue de Windows, français, anglais ou espagnol, appliquée tout de suite
+- La version de Pénombre s'affiche discrètement en bas de la colonne des rubriques
 
 ## 0.5.2
 

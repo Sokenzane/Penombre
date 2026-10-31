@@ -209,7 +209,7 @@ Dans `%APPDATA%\Penombre\` (ou `Penombre-data` à côté de l'exe en [mode porta
 - `settings.ini` : tous les réglages, y compris ceux par compte et les raccourcis. Si ton client ne s'appelle pas `Dofus.exe`, modifie la ligne `process=`. Pour tout remettre à zéro : **Réinitialiser les réglages…** (onglet Général), ou supprime le fichier.
 - `penombre.log` : le journal (démarrage, fenêtres détectées, erreurs). Au-delà de 512 Ko, il est renommé en `penombre.log.old`.
 
-L'interface suit la langue de Windows (français, anglais ou espagnol) ; `--lang=fr`, `--lang=en` ou `--lang=es` force la langue. Le lancement au démarrage écrit une seule valeur sous `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` ; rien d'autre n'est écrit sur ton système.
+L'interface suit la langue de Windows (français, anglais ou espagnol). Pour en choisir une autre, clique sur le petit bouton de langue (`FR ▾`) en haut à gauche de la fenêtre de réglages ; `--lang=fr`, `--lang=en` ou `--lang=es` la force au lancement. Le lancement au démarrage écrit une seule valeur sous `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` ; rien d'autre n'est écrit sur ton système.
 
 ## Diagnostic et journal
 

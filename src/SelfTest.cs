@@ -939,6 +939,14 @@ namespace Penombre
             string defaults = Path.Combine(dir, "defaults.ini");
             Settings.SaveTo(defaults);
 
+            // Languages
+            string language = T.Code;
+            T.Init("es"); string es = T.S("quit");
+            T.Init("en"); string en = T.S("quit");
+            T.Init("fr"); string fr = T.S("quit");
+            T.Init(language);
+            Check("interface in Spanish, English and French", es == "Salir" && en == "Quit" && fr == "Quitter", es + " / " + en + " / " + fr);
+
             // Update check: reading the GitHub answer and comparing versions (no network here).
             Check("update check reads the release tag", Updates.ParseTag("{\"url\":\"x\",\"tag_name\": \"v1.2.10\",\"name\":\"y\"}") == "1.2.10"
                   && Updates.ParseTag("{\"message\":\"Not Found\"}") == null, "");

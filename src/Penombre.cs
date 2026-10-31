@@ -107,6 +107,7 @@ namespace Penombre
 
                 Settings.Init();
                 Settings.Load();
+                if (lang == null && Settings.Language.Length > 0) T.Init(Settings.Language);
                 Log.Info("Pénombre " + Program.Version + " started - " + WindowsVersion() + (Environment.Is64BitProcess ? " x64" : " x86")
                          + (Settings.IsPortable ? " - portable" : ""));
                 Mag.Init();
@@ -499,6 +500,8 @@ namespace Penombre
                                     "En pausa hasta las {0}" } },
             { "resume",     new[] { "Resume now", "Reprendre maintenant",
                                     "Reanudar ahora" } },
+            { "langAuto",   new[] { "Windows language", "Langue de Windows", "Idioma de Windows" } },
+            { "langTip",    new[] { "Language", "Langue", "Idioma" } },
             { "updCheck",   new[] { "Check for updates (once a day, on GitHub)", "Vérifier les mises à jour (une fois par jour, sur GitHub)",
                                     "Buscar actualizaciones (una vez al día, en GitHub)" } },
             { "updNow",     new[] { "Check now", "Vérifier maintenant",
@@ -773,10 +776,26 @@ namespace Penombre
                                     "Cerrar" } },
         };
 
+        public static readonly string[] Codes = { "en", "fr", "es" };
+        public static readonly string[] Names = { "English", "Français", "Español" };
+        public static event Action LanguageChanged;
+
+        // lang: "en", "fr", "es", or null / "" for the Windows language.
         public static void Init(string lang)
         {
-            if (lang == null) lang = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+            if (string.IsNullOrEmpty(lang)) lang = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
             column = lang == "fr" ? 1 : lang == "es" ? 2 : 0;
+        }
+
+        public static string Code { get { return Codes[column]; } }
+
+        // Chosen in the settings: saved, and the menus and windows are rebuilt.
+        public static void Choose(string lang)
+        {
+            Settings.Language = lang ?? "";
+            Settings.Save();
+            Init(lang);
+            if (LanguageChanged != null) LanguageChanged();
         }
 
         public static string S(string key) { string[] t = texts[key]; return t[column < t.Length ? column : 0]; }
@@ -1242,7 +1261,8 @@ namespace Penombre
         public static bool TrayIconAuto = true;     // the icon follows the sky of the automatic mode
         public static int TrayIconColor = 0;        // otherwise, the picture kept while the filter is on (TrayIcons.Night / Twilight / Day)
         public static bool CheckUpdates = true;     // asks GitHub once a day whether a newer version exists
-        public static bool DuskTint = true;         // automatic mode: the Dusk colours at sunset and sunrise
+        public static bool DuskTint = true;
+        public static string Language = "";         // "" = the Windows language, else "en", "fr" or "es"         // automatic mode: the Dusk colours at sunset and sunrise
 
         public static Dictionary<string, AccountProfile> Accounts = new Dictionary<string, AccountProfile>();
         public static Keys[] Hotkeys = Shortcuts.Defaults();
@@ -1409,6 +1429,7 @@ namespace Penombre
                     case "trayIconColor": if (int.TryParse(v, out n)) TrayIconColor = Math.Max(0, Math.Min(2, n)); break;
                     case "checkUpdates": CheckUpdates = v != "0"; break;
                     case "duskTint": DuskTint = v != "0"; break;
+                    case "lang": Language = Array.IndexOf(T.Codes, v) >= 0 ? v : ""; break;
                 }
             }
             return true;
@@ -1478,6 +1499,7 @@ namespace Penombre
                 "trayIconColor=" + TrayIconColor,
                 "checkUpdates=" + (CheckUpdates ? "1" : "0"),
                 "duskTint=" + (DuskTint ? "1" : "0"),
+                "lang=" + Language,
             };
             for (int i = 0; i < Shortcuts.Count; i++) lines.Add("hotkey." + Shortcuts.SettingNames[i] + "=" + (int)Hotkeys[i]);
             foreach (var kv in Accounts)
@@ -2899,6 +2921,27 @@ namespace Penombre
             var closeX = new GameButton("", GameButton.Kind.Close);
             closeX.Click += (s, e) => Close();
             header.Controls.Add(closeX);
+            var lang = new LanguageChip { Text = T.Code.ToUpperInvariant(), AccessibleName = T.S("langTip") };
+            new ToolTip().SetToolTip(lang, T.S("langTip"));
+            lang.Click += (s, e) =>
+            {
+                var menu = new ContextMenuStrip { Font = Theme.Body(9.5f) };
+                var auto = new ToolStripMenuItem(T.S("langAuto")) { Checked = Settings.Language.Length == 0 };
+                auto.Click += (s2, e2) => T.Choose("");
+                menu.Items.Add(auto);
+                menu.Items.Add(new ToolStripSeparator());
+                for (int i = 0; i < T.Codes.Length; i++)
+                {
+                    string code = T.Codes[i];
+                    var it = new ToolStripMenuItem(T.Names[i]) { Checked = Settings.Language == code };
+                    it.Click += (s2, e2) => T.Choose(code);
+                    menu.Items.Add(it);
+                }
+                menu.Closed += (s2, e2) => BeginInvoke((Action)menu.Dispose);
+                menu.Show(lang, new Point(0, lang.Height + Theme.Px(2)));
+            };
+            header.Controls.Add(lang);
+            header.Resize += (s, e) => lang.Location = new Point(Theme.Px(14), (header.Height - Theme.Px(2) - lang.Height) / 2);
             header.Resize += (s, e) => closeX.Location = new Point(header.Width - closeX.Width - Theme.Px(10), (header.Height - Theme.Px(2) - closeX.Height) / 2);
 
             Controls.Add(host);
@@ -2963,6 +3006,8 @@ namespace Penombre
         public Control PageHost { get { return host; } }
         public Control Page(int i) { return pages[i]; }
         public bool RefreshPreview() { preview.TakeShot(); return preview.LastShotDirect; }
+
+        public int CurrentPage { get { return current; } }
 
         public void SelectPage(int index)
         {
@@ -3750,6 +3795,7 @@ namespace Penombre
             stateTimer.Start();
 
             pauseTimer.Tick += (s, e) => { if (DateTime.Now >= pauseUntil) Resume(); };
+            T.LanguageChanged += OnLanguageChanged;
 
             // Update check: a moment after start, then once a day (never in the self-test).
             Updates.Changed += OnUpdates;
@@ -3787,6 +3833,31 @@ namespace Penombre
             pauseTimer.Stop();
             overlays.ApplyLook();
             RefreshUi();
+        }
+
+        // New language: the menu and the settings window are built again with the new texts.
+        void OnLanguageChanged()
+        {
+            ContextMenuStrip old = tray.ContextMenuStrip;
+            BuildMenu();
+            if (old != null) old.Dispose();
+            RefreshUi();
+            OnUpdates();
+            if (settingsForm != null && !settingsForm.IsDisposed)
+            {
+                SettingsForm form = settingsForm;
+                Point where = form.Location;
+                int page = form.CurrentPage;
+                form.BeginInvoke((Action)(() =>
+                {
+                    form.Close();
+                    form.Dispose();
+                    OpenSettings();
+                    settingsForm.StartPosition = FormStartPosition.Manual;
+                    settingsForm.Location = where;
+                    settingsForm.SelectPage(page);
+                }));
+            }
         }
 
         void OnUpdates()
@@ -4117,6 +4188,7 @@ namespace Penombre
             stateTimer.Dispose();
             updateTimer.Dispose();
             pauseTimer.Dispose();
+            T.LanguageChanged -= OnLanguageChanged;
             Updates.Changed -= OnUpdates;
             if (settingsForm != null && !settingsForm.IsDisposed) settingsForm.Dispose();
             hotkeys.Dispose();
