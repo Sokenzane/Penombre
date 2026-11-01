@@ -74,7 +74,7 @@ jobs:
 
       # Releases are immutable once published: create a draft with the exe, then publish it.
       - name: Create the release (draft)
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           name: Pénombre ${{ github.ref_name }}
           body_path: notes.md
